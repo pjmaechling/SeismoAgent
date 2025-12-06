@@ -1,0 +1,30 @@
+[
+  {
+    "station": "NP.1584B.10.HNE",
+    "distance_km": 11.457775627625292,
+    "pga_m_s2": 2.1821321684075623,
+    "pga_g": 0.22243956864501144,
+    "provider": "NCEDC"
+  },
+  {
+    "station": "NP.1586.10.HNE",
+    "distance_km": 21.64515294561236,
+    "pga_m_s2": 2.156846934037122,
+    "pga_g": 0.21986207278665873,
+    "provider": "NCEDC"
+  },
+  {
+    "station": "NP.1023.10.HNE",
+    "distance_km": 14.637099834938056,
+    "pga_m_s2": 2.137617108552859,
+    "pga_g": 0.21790184592791628,
+    "provider": "NCEDC"
+  },
+  {
+    "station": "NC.KCT..HNE",
+    "distance_km": 9.092687365919861,
+    "pga_m_s2": 0.8137598539752591,
+    "pga_g": 0.08295207481908859,
+    "provider": "NCEDC"
+  }
+]
