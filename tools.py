@@ -15,6 +15,144 @@ import numpy as np
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 
+import math
+from libcomcat.search import get_event_by_id
+
+
+# ... (keep existing imports and functions) ...
+
+def get_mechanism(event_id):
+    """
+    Fetches the best available Focal Mechanism (Strike/Dip/Rake) from USGS.
+    Returns a dictionary or defaults if none found.
+    """
+    print(f"--- TOOL: Searching for Focal Mechanism/Moment Tensor ---")
+    try:
+        detail = get_event_by_id(event_id)
+
+        # Try to get the preferred moment tensor product
+        mt = detail.getProducts('moment-tensor')
+        if not mt:
+            mt = detail.getProducts('focal-mechanism')
+
+        if mt:
+            # Parse the first available tensor
+            tensor = mt[0]
+            # libcomcat usually hides these deep in properties,
+            # but often 'np1_strike' etc are in the product properties
+            props = tensor.properties
+
+            # Extract Nodal Plane 1 (Standard convention)
+            s = float(props.get('nodal-plane-1-strike', 0))
+            d = float(props.get('nodal-plane-1-dip', 90))
+            r = float(props.get('nodal-plane-1-rake', 0))
+
+            print(f"    Found Mechanism: Strike={s}, Dip={d}, Rake={r}")
+            return {"strike": s, "dip": d, "rake": r}
+
+    except Exception as e:
+        print(f"    Warning: Could not retrieve mechanism ({e}).")
+
+    print("    No mechanism found. Using generic California Strike-Slip defaults.")
+    return {"strike": 0, "dip": 90, "rake": 0}
+
+
+def calculate_fault_dims(magnitude):
+    """
+    Estimates Fault Length and Width using Wells & Coppersmith (1994)
+    Empirical relationships for 'All' slip types.
+    """
+    # Rupture Area (A) = 10 ^ (-3.49 + 0.91 * Mw)
+    area = 10 ** (-3.49 + 0.91 * magnitude)
+
+    # Rupture Width (W) = 10 ^ (-1.01 + 0.32 * Mw)
+    width = 10 ** (-1.01 + 0.32 * magnitude)
+
+    # Ensure Width doesn't exceed seismogenic thickness (e.g. 15-20km)
+    if width > 20.0:
+        width = 20.0
+
+    length = area / width
+
+    return length, width
+
+
+def generate_bbp_src(event_data, mechanism, output_file="event.src"):
+    """
+    Generates a SCEC Broadband Platform .src file.
+    Assumes the USGS hypocenter is the CENTROID of the rupture.
+    """
+    print(f"--- TOOL: Generating BBP Source File: {output_file} ---")
+
+    mag = event_data['magnitude']
+    hypo_lat = event_data['latitude']
+    hypo_lon = event_data['longitude']
+    hypo_depth = event_data['depth_km']
+
+    strike = mechanism['strike']
+    dip = mechanism['dip']
+    rake = mechanism['rake']
+
+    # 1. Calculate Dimensions (Scaling Law)
+    length, width = calculate_fault_dims(mag)
+
+    # 2. Geometry Calculations
+    # We assume the Hypocenter is the Centroid (Center of the fault plane)
+    # So Hypo is at 0.0 along strike, and W/2 down dip
+    hypo_along_strike = 0.0  # Center
+    hypo_down_dip = width / 2.0
+
+    # Calculate Depth to Top of Fault
+    # Z_top = Z_hypo - (Dist_Up_Dip * sin(dip))
+    # Dist_Up_Dip is half the width
+    rad_dip = math.radians(dip)
+    depth_to_top = hypo_depth - (hypo_down_dip * math.sin(rad_dip))
+
+    # Safety: Don't let the fault float above the ground
+    if depth_to_top < 0:
+        print("    Adjustment: Fault top projected above ground. Clamping to 0.")
+        depth_to_top = 0.0
+        # Re-adjust hypocenter down dip to fit
+        hypo_down_dip = hypo_depth / math.sin(rad_dip)
+
+    # Calculate Top Center Lat/Lon
+    # If the fault dips, the top edge is horizontally offset from the hypocenter
+    # Horizontal offset = (Width/2) * cos(dip)
+    # Direction = Strike - 90 degrees (Up dip direction is perpendicular to strike)
+
+    offset_dist_km = (width / 2.0) * math.cos(rad_dip)
+
+    # Simple Flat Earth approximation for small offsets (sufficient for src generation)
+    # 1 deg lat ~= 111 km
+    # 1 deg lon ~= 111 km * cos(lat)
+    if offset_dist_km > 0.001:
+        azimuth_rad = math.radians(strike - 90)
+        d_lat = (offset_dist_km * math.cos(azimuth_rad)) / 111.0
+        d_lon = (offset_dist_km * math.sin(azimuth_rad)) / (111.0 * math.cos(math.radians(hypo_lat)))
+
+        lat_top_center = hypo_lat + d_lat
+        lon_top_center = hypo_lon + d_lon
+    else:
+        lat_top_center = hypo_lat
+        lon_top_center = hypo_lon
+
+    # 3. Write File
+    with open(output_file, "w") as f:
+        f.write(f"MAGNITUDE = {mag:.2f}\n")
+        f.write(f"FAULT_LENGTH = {length:.2f}\n")
+        f.write(f"FAULT_WIDTH = {width:.2f}\n")
+        f.write(f"DEPTH_TO_TOP = {depth_to_top:.2f}\n")
+        f.write(f"STRIKE = {strike:.1f}\n")
+        f.write(f"DIP = {dip:.1f}\n")
+        f.write(f"RAKE = {rake:.1f}\n")
+        f.write(f"LAT_TOP_CENTER = {lat_top_center:.5f}\n")
+        f.write(f"LON_TOP_CENTER = {lon_top_center:.5f}\n")
+        f.write(f"HYPO_ALONG_STRIKE = {hypo_along_strike:.1f}\n")
+        f.write(f"HYPO_DOWN_DIP = {hypo_down_dip:.2f}\n")
+        f.write(f"SEED = 12345\n")  # Random seed for stochastic parts
+
+    print(f"    File written. L={length:.1f}km, W={width:.1f}km, Ztop={depth_to_top:.1f}km")
+    return output_file
 
 # ... (keep other functions like get_event_details, get_nearest_stations as is) ...
 
