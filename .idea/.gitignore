@@ -1,3 +1,27 @@
+# Agent recommendations
+# Python Environments
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Operating System
+.DS_Store
+
+# PyCharm / IDE Files
+.idea/
+
+# SeismoAgent Specific Outputs (CRITICAL)
+outdata/
+observed_plots/
+observed_waveforms/
+bbp_input.txt
+*.srf
+*.gsf
+*.vel.bbp
+*.acc.bbp
+*.rd50
+
 # Default ignored files
 /shelf/
 /workspace.xml
