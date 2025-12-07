@@ -19,6 +19,73 @@ from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 
 
+# tools.py (Add this new function)
+def get_simulated_pgas(pga_data, output_dir="outdata"):
+    """
+    Parses BBP output (.rd50 files) for simulated PGA values.
+    Returns a list of dictionaries containing station info and simulated PGA.
+
+    pga_data: The list of observed data used to get the station coordinates/list.
+    """
+    import glob
+    import os
+
+    print(f"\n--- TOOL: Parsing Simulated PGA Results ---")
+
+    # 1. Find the latest run directory (the directory with the most recent timestamp)
+    abs_out_dir = os.path.abspath(output_dir)
+    try:
+        subdirs = [d for d in glob.glob(f"{abs_out_dir}/*") if os.path.isdir(d)]
+        latest_run_dir = max(subdirs, key=os.path.getmtime)
+        print(f"    Reading simulation results from: {latest_run_dir}")
+    except ValueError:
+        print("    No BBP output directory found.")
+        return []
+
+    # 2. Parse .rd50 files to get PGA in g
+    rd50_files = glob.glob(f"{latest_run_dir}/*.rd50")
+    sim_vals_by_filename = {}
+
+    for rfile in rd50_files:
+        fname = os.path.basename(rfile)
+        with open(rfile, 'r') as f:
+            for line in f:
+                if line.startswith('#'): continue
+                parts = line.split()
+                try:
+                    # PGA is the first column when the period is < 0.02
+                    if float(parts[0]) < 0.02:
+                        sim_vals_by_filename[fname] = float(parts[1])  # Value is PGA in g
+                        break
+                except:
+                    continue
+
+    # 3. Combine Simulated PGAs with Station Coordinates
+    simulated_pga_list = []
+
+    for obs in pga_data:
+        sid = obs['station']
+        matched_sim_g = None
+
+        # Match station ID to the filename
+        for fname, pga_g in sim_vals_by_filename.items():
+            if sid in fname:
+                matched_sim_g = pga_g
+                break
+
+        if matched_sim_g:
+            # Recreate the data structure needed for mapping
+            simulated_pga_list.append({
+                "station": sid,
+                "latitude": obs['latitude'],
+                "longitude": obs['longitude'],
+                "distance_km": obs['distance_km'],
+                "pga_g": matched_sim_g,
+                "pga_m_s2": matched_sim_g * 9.81
+            })
+
+    return simulated_pga_list
+
 def generate_comparison_map(pga_data, sim_vals, event_data, output_file="comparison_map.png"):
     """
     Generates a map showing Observed vs Simulated residuals.
