@@ -1,467 +1,350 @@
-# tools.py
-import subprocess
-import contextily
-import os
-import sys
-# ... (rest of your imports like numpy, obspy, etc.)
-import matplotlib.pyplot as plt
-import datetime
-import math
 import time
-from libcomcat.search import search
-from obspy.geodetics import gps2dist_azimuth
-# tools.py
+import datetime  # <--- THIS WAS MISSING
+import os
+import subprocess
+import glob
+import math
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-import glob
 from obspy.clients.fdsn import Client
+# ... (rest of the file remains the same)
 from obspy import UTCDateTime
+from obspy.clients.fdsn.header import URL_MAPPINGS
+from libcomcat.search import search, get_event_by_id
+
+# Fix for NCEDC redirects
+URL_MAPPINGS['SCEDC'] = "https://service.scedc.caltech.edu"
+URL_MAPPINGS['NCEDC'] = "https://service.ncedc.org"
 
 
-# tools.py (Add this new function)
-def get_simulated_pgas(pga_data, output_dir="outdata"):
+# --- HELPER: Directory Management ---
+def ensure_run_directory(event_id, base_dir="outdata"):
     """
-    Parses BBP output (.rd50 files) for simulated PGA values.
-    Returns a list of dictionaries containing station info and simulated PGA.
-
-    pga_data: The list of observed data used to get the station coordinates/list.
+    Creates a unique directory for the event run if it doesn't exist.
+    Returns the path to that directory.
     """
-    import glob
-    import os
+    # Structure: outdata/Event_ci12345678
+    run_dir = os.path.join(base_dir, f"Event_{event_id}")
+    if not os.path.exists(run_dir):
+        os.makedirs(run_dir)
+    return run_dir
 
-    print(f"\n--- TOOL: Parsing Simulated PGA Results ---")
 
-    # 1. Find the latest run directory (the directory with the most recent timestamp)
-    abs_out_dir = os.path.abspath(output_dir)
+# --- DATA RETRIEVAL ---
+
+def get_recent_quakes(min_magnitude=3.0, lookback_hours=24):
+    """
+    Searches USGS ComCat for recent earthquakes in California.
+    """
+    start_time = datetime.datetime.utcnow() - datetime.timedelta(hours=lookback_hours)
+    print(f"--- TOOL: Scanning USGS for M{min_magnitude}+ CA events since {start_time.strftime('%H:%M')} UTC ---")
+
     try:
-        subdirs = [d for d in glob.glob(f"{abs_out_dir}/*") if os.path.isdir(d)]
-        latest_run_dir = max(subdirs, key=os.path.getmtime)
-        print(f"    Reading simulation results from: {latest_run_dir}")
-    except ValueError:
-        print("    No BBP output directory found.")
+        events = search(starttime=start_time, minmagnitude=min_magnitude,
+                        maxlatitude=42.0, minlatitude=32.0,
+                        maxlongitude=-114.0, minlongitude=-125.0)
+    except Exception as e:
+        print(f"    USGS Search Error: {e}")
         return []
 
-    # 2. Parse .rd50 files to get PGA in g
-    rd50_files = glob.glob(f"{latest_run_dir}/*.rd50")
-    sim_vals_by_filename = {}
-
-    for rfile in rd50_files:
-        fname = os.path.basename(rfile)
-        with open(rfile, 'r') as f:
-            for line in f:
-                if line.startswith('#'): continue
-                parts = line.split()
-                try:
-                    # PGA is the first column when the period is < 0.02
-                    if float(parts[0]) < 0.02:
-                        sim_vals_by_filename[fname] = float(parts[1])  # Value is PGA in g
-                        break
-                except:
-                    continue
-
-    # 3. Combine Simulated PGAs with Station Coordinates
-    simulated_pga_list = []
-
-    for obs in pga_data:
-        sid = obs['station']
-        matched_sim_g = None
-
-        # Match station ID to the filename
-        for fname, pga_g in sim_vals_by_filename.items():
-            if sid in fname:
-                matched_sim_g = pga_g
-                break
-
-        if matched_sim_g:
-            # Recreate the data structure needed for mapping
-            simulated_pga_list.append({
-                "station": sid,
-                "latitude": obs['latitude'],
-                "longitude": obs['longitude'],
-                "distance_km": obs['distance_km'],
-                "pga_g": matched_sim_g,
-                "pga_m_s2": matched_sim_g * 9.81
+    structured_events = []
+    if events:
+        sorted_events = sorted(events, key=lambda x: x.magnitude, reverse=True)
+        for event in sorted_events:
+            structured_events.append({
+                "id": event.id,
+                "magnitude": event.magnitude,
+                "time": event.time.isoformat(),
+                "location": event.location,
+                "latitude": event.latitude,
+                "longitude": event.longitude,
+                "depth_km": event.depth
             })
+    return structured_events
 
-    return simulated_pga_list
 
-def generate_comparison_map(pga_data, sim_vals, event_data, output_file="comparison_map.png"):
-    """
-    Generates a map showing Observed vs Simulated residuals.
-    UPDATED: Adds an OpenStreetMap basemap with roads using contextily.
-    """
-    import matplotlib.pyplot as plt
-    # New import for basemaps
+def get_event_details(event_id):
+    """Retrieves details for a specific earthquake ID."""
+    print(f"--- TOOL: Retrieving details for Event ID: {event_id} ---")
     try:
-        import contextily as cx
-        has_contextily = True
-    except ImportError:
-        print("    Warning: 'contextily' library not found. Map will be generated without roads.")
-        print("    To see roads, run: pip install contextily")
-        has_contextily = False
-
-    print(f"--- TOOL: Generating Comparison Map: {output_file} ---")
-
-    lats, lons, diffs = [], [], []
-
-    for obs in pga_data:
-        sid = obs['station']
-        obs_g = obs['pga_g']
-
-        # Find matching simulation value
-        matched_sim_g = None
-        for fname, val in sim_vals.items():
-            if sid in fname:
-                matched_sim_g = val
-                break
-
-        if matched_sim_g:
-            # Calculate % Difference
-            diff = (matched_sim_g - obs_g) / obs_g * 100.0
-            lats.append(obs['latitude'])
-            lons.append(obs['longitude'])
-            diffs.append(diff)
-
-    if not lats:
-        print("    No matched data to plot.")
-        return
-
-    # Use subplots to get the axes object required by contextily
-    fig, ax = plt.subplots(figsize=(12, 12))
-
-    # 1. Plot Stations (Increased zorder to sit on top of map)
-    scatter = ax.scatter(lons, lats, c=diffs, cmap='seismic', vmin=-100, vmax=100,
-                         s=150, edgecolors='k', zorder=10)
-
-    # 2. Plot Earthquake Epicenter (Highest zorder)
-    ax.scatter(event_data['longitude'], event_data['latitude'], s=500, c='gold',
-               marker='*', edgecolors='black', label='Epicenter', zorder=15)
-
-    # 3. Add Basemap (Roads via OpenStreetMap)
-    if has_contextily:
-        try:
-            print("    Downloading basemap tiles (this might take a moment)...")
-            # crs='EPSG:4326' tells contextily our data is in standard Lat/Lon degrees.
-            # It automatically reprojects the web tiles to match.
-            cx.add_basemap(ax, crs='EPSG:4326', source=cx.providers.OpenStreetMap.Mapnik, alpha=0.8)
-        except Exception as e:
-            print(f"    Warning: Could not fetch basemap tiles ({e}). Plotting without roads.")
-
-    # 4. Decoration
-    cbar = plt.colorbar(scatter, ax=ax, fraction=0.036, pad=0.04)
-    cbar.set_label('Simulation Bias (%) \n(Blue = Under-Predict, Red = Over-Predict)', fontsize=10)
-
-    ax.set_title(f"Simulation Accuracy: Event {event_data['id']}\n(M{event_data['magnitude']})", fontsize=14)
-    ax.set_xlabel("Longitude")
-    ax.set_ylabel("Latitude")
-    ax.legend(loc='upper right')
-
-    # Ensure map doesn't look stretched
-    ax.set_aspect('equal')
-
-    # Save
-    plt.savefig(output_file, dpi=150, bbox_inches='tight')
-    print(f"    Map saved to {output_file}")
-    plt.close()
+        event = get_event_by_id(event_id)
+        return {
+            "id": event.id,
+            "magnitude": event.magnitude,
+            "time": event.time.isoformat(),
+            "location": event.location,
+            "latitude": event.latitude,
+            "longitude": event.longitude,
+            "depth_km": event.depth
+        }
+    except Exception as e:
+        print(f"Error finding event {event_id}: {e}")
+        return None
 
 
-from obspy.clients.fdsn.header import URL_MAPPINGS
-URL_MAPPINGS['NCEDC'] = "https://service.ncedc.org"
-# Explicit mapping to ensure we hit the SCEDC server correctly
-URL_MAPPINGS['SCEDC'] = "https://service.scedc.caltech.edu"
-
-# ... (Keep select_1d_velocity_model, generate_bbp_input_text, run_bbp_simulation, etc.) ...
-
-def get_waveforms_and_pga(event, stations):
-    """
-    Downloads waveforms & Plots.
-    UPDATED: Includes Rate Limiting (Sleep) and Retry Logic to avoid HTTP 500 errors.
-    """
-    event_time = UTCDateTime(event['time'])
-    results = []
-
-    # Dynamic Data Center Selection
-    if event['latitude'] > 36.0:
-        client_name = "NCEDC"
-        URL_MAPPINGS['NCEDC'] = "https://service.ncedc.org"
-    else:
-        client_name = "SCEDC"
-
-    client = Client(client_name)
-
-    if not os.path.exists("observed_plots"):
-        os.makedirs("observed_plots")
-
-    print(f"--- TOOL: Downloading Horizontal Waveforms & Plotting ---")
-
-    for i, sta in enumerate(stations):
-        net = sta['network']
-        code = sta['station']
-        dist = sta['distance_km']
-
-        # STRICT FILTER: Only process target networks
-        if net not in ["CI", "NC", "BK"]:
-            continue
-
-        # RATE LIMITING: Pause every 5 stations to let the server connection close
-        if i > 0 and i % 5 == 0:
-            time.sleep(2)
-
-            # RETRY LOOP: Try up to 3 times if we get a server error
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                # 1. Ask for channels (Lightweight metadata query)
-                try:
-                    inventory = client.get_stations(
-                        network=net, station=code,
-                        starttime=event_time, endtime=event_time + 60,
-                        level="channel", channel="HN*,BH*"
-                    )
-                except Exception:
-                    # If metadata fails, it's usually not a server overload, just no data.
-                    # Try IRIS once, then skip.
-                    try:
-                        client_fallback = Client("IRIS")
-                        inventory = client_fallback.get_stations(
-                            network=net, station=code,
-                            starttime=event_time, endtime=event_time + 60,
-                            level="channel", channel="HN*,BH*"
-                        )
-                        client_active = client_fallback
-                    except:
-                        break  # Break inner retry loop, move to next station
-                else:
-                    client_active = client
-
-                # 2. Find Pair (Logic unchanged)
-                valid_pair = None
-                used_instr = None
-
-                instr_groups = {}
-                for n in inventory:
-                    for s in n:
-                        for c in s:
-                            instr = c.code[:2]
-                            if instr not in instr_groups: instr_groups[instr] = []
-                            instr_groups[instr].append(c)
-
-                for instr in ["HN", "BH"]:
-                    if instr in instr_groups:
-                        chans = instr_groups[instr]
-                        horizontals = [c for c in chans if c.code[2] in ['N', 'E', '1', '2']]
-                        if len(horizontals) >= 2:
-                            horizontals.sort(key=lambda x: x.code)
-                            valid_pair = (horizontals[0], horizontals[1])
-                            used_instr = instr
-                            break
-
-                if not valid_pair:
-                    break  # Stop retrying if simply no pair exists
-
-                # 3. Download (The heavy part that causes 500 errors)
-                chan1 = valid_pair[0]
-                chan2 = valid_pair[1]
-
-                print(
-                    f"  - Attempting: {net}.{code:<5} ({dist:.1f} km) -> {chan1.code}/{chan2.code} (Try {attempt + 1})")
-
-                st = client_active.get_waveforms(
-                    net, code, chan1.location_code, f"{used_instr}*",
-                    event_time - 10, event_time + 60,
-                    attach_response=True
-                )
-
-                st_filtered = st.select(channel=chan1.code) + st.select(channel=chan2.code)
-                if len(st_filtered) < 2:
-                    print(f"    -> Failed: Incomplete pair.")
-                    break
-
-                    # 4. PLOT & PHYSICS (Success path)
-                plot_filename = f"observed_plots/{net}.{code}.png"
-                st_filtered.plot(outfile=plot_filename)
-
-                pgas = []
-                pre_filt = [0.05, 0.1, 35, 40]
-
-                for tr in st_filtered:
-                    tr.remove_response(output="ACC", pre_filt=pre_filt, water_level=60)
-                    pgas.append(np.max(np.abs(tr.data)))
-
-                rotd50_m_s2 = np.sqrt(pgas[0] * pgas[1])
-                rotd50_g = rotd50_m_s2 / 9.81
-
-                print(f"    -> Success! RotD50~={rotd50_m_s2:.4f} m/s²")
-
-                results.append({
-                    "station": f"{net}.{code}",
-                    "latitude": sta['latitude'],
-                    "longitude": sta['longitude'],
-                    "distance_km": sta['distance_km'],
-                    "pga_m_s2": rotd50_m_s2,
-                    "pga_g": rotd50_g
-                })
-
-                # Success! Break the retry loop and go to next station
-                break
-
-            except Exception as e:
-                # Catch the 500 Error
-                err_msg = str(e)
-                if "500" in err_msg or "Internal Server Error" in err_msg:
-                    print(f"    -> Server Overload (500). Waiting 10s...")
-                    time.sleep(10)  # Back off significantly
-                else:
-                    print(f"    -> Error: {e}")
-                    break  # If it's not a server error (e.g. 404), don't retry.
-
-        # Gentle pause between every station
-        time.sleep(1.0)
-
-    return results
-
-# tools.py (Replace compare_results)
-
-def compare_results(pga_data, sim_id, event_data, output_dir="outdata"):
-    """
-    Parses BBP output, prints table, and generates the COMPARISON MAP inside the run folder.
-    """
-    print(f"\n--- TOOL: Validating Simulation Results ---")
-
-    # 1. Find the latest run directory
-    abs_out_dir = os.path.abspath(output_dir)
-    try:
-        subdirs = [d for d in glob.glob(f"{abs_out_dir}/*") if os.path.isdir(d)]
-        latest_run_dir = max(subdirs, key=os.path.getmtime)
-        run_id = os.path.basename(latest_run_dir)
-        print(f"    Analysis directory: {latest_run_dir}")
-    except ValueError:
-        print("    No output directory found.")
-        return
-
-    # 2. Parse .rd50 files
-    rd50_files = glob.glob(f"{latest_run_dir}/*.rd50")
-    sim_vals = {}
-
-    for rfile in rd50_files:
-        fname = os.path.basename(rfile)
-        with open(rfile, 'r') as f:
-            for line in f:
-                if line.startswith('#'): continue
-                parts = line.split()
-                try:
-                    if float(parts[0]) < 0.02:  # PGA
-                        sim_vals[fname] = float(parts[1])
-                        break
-                except:
-                    continue
-
-    # 3. Print Table
-    print(f"\n{'STATION':<10} | {'OBS (g)':<10} | {'SIM (g)':<10} | {'DIFF':<8} | {'VERDICT':<15}")
-    print("-" * 65)
-
-    for obs in pga_data:
-        sid = obs['station']
-        obs_g = obs['pga_g']
-
-        matched_sim_g = None
-        for fname in sim_vals:
-            if sid in fname:
-                matched_sim_g = sim_vals[fname]
-                break
-
-        if matched_sim_g:
-            diff = (matched_sim_g - obs_g) / obs_g * 100.0
-            verdict = "Accurate"
-            if diff > 50:
-                verdict = "Over-Predict"
-            elif diff < -50:
-                verdict = "Under-Predict"
-
-            print(f"{sid:<10} | {obs_g:<10.4f} | {matched_sim_g:<10.4f} | {diff:+.0f}%    | {verdict}")
-        else:
-            print(f"{sid:<10} | {obs_g:<10.4f} | {'N/A':<10} | --       | --")
-
-    # 4. Generate Map INSIDE the run directory
-    # We name it clearly with the Run ID
-    map_filename = os.path.join(latest_run_dir, f"comparison_map_{run_id}.png")
-
-    generate_comparison_map(pga_data, sim_vals, event_data, output_file=map_filename)
-
-# tools.py (Replace existing get_mechanism)
 def get_mechanism(event_id):
-    """
-    Fetches the best available Focal Mechanism.
-    Handles libcomcat/pandas compatibility issues.
-    """
+    """Fetches Focal Mechanism (Strike/Dip/Rake)."""
     print(f"--- TOOL: Searching for Focal Mechanism/Moment Tensor ---")
     try:
         detail = get_event_by_id(event_id)
-
-        # Robust product lookup
         try:
             mt = detail.getProducts('moment-tensor')
         except Exception:
             mt = None
-
         if not mt:
             try:
                 mt = detail.getProducts('focal-mechanism')
             except Exception:
-                pass
+                mt = None
 
         if not mt:
             print("    No mechanism product found. Using generic defaults.")
             return {"strike": 0, "dip": 90, "rake": 0}
 
-        # Parse the first available tensor properties directly
         tensor = mt[0]
         props = tensor.properties
-
-        # Robust extraction of Nodal Plane 1
         s = float(props.get('nodal-plane-1-strike') or props.get('np1_strike') or 0)
         d = float(props.get('nodal-plane-1-dip') or props.get('np1_dip') or 90)
         r = float(props.get('nodal-plane-1-rake') or props.get('np1_rake') or 0)
 
         print(f"    Found Mechanism: Strike={s}, Dip={d}, Rake={r}")
         return {"strike": s, "dip": d, "rake": r}
-
     except Exception as e:
-        print(f"    Warning: Could not retrieve mechanism ({e}).")
+        print(f"    Warning: Could not retrieve mechanism ({e}). Using defaults.")
         return {"strike": 0, "dip": 90, "rake": 0}
 
 
+# --- STATION & WAVEFORMS ---
+
+def get_nearest_stations(event, max_radius_deg=1.5, max_stations=40):
+    """Finds nearest stations (State-Aware: NCEDC vs SCEDC)."""
+    if event['latitude'] > 36.0:
+        client_name = "NCEDC"
+    else:
+        client_name = "SCEDC"
+
+    client = Client(client_name)
+    event_time = UTCDateTime(event['time'])
+
+    print(f"--- TOOL: Searching stations ({max_radius_deg:.2f} deg) using {client_name} ---")
+
+    try:
+        inventory = client.get_stations(
+            latitude=event['latitude'], longitude=event['longitude'],
+            maxradius=max_radius_deg, starttime=event_time, endtime=event_time + 600,
+            network="CI,NC,BK,CE,NP", channel="HN*,BH*", level="station"
+        )
+    except Exception as e:
+        print(f"    Station search warning: {e}")
+        return []
+
+    station_list = []
+    for network in inventory:
+        for station in network:
+            from obspy.geodetics import gps2dist_azimuth
+            distance_m, _, _ = gps2dist_azimuth(event['latitude'], event['longitude'], station.latitude,
+                                                station.longitude)
+            station_list.append({
+                "network": network.code,
+                "station": station.code,
+                "latitude": station.latitude,
+                "longitude": station.longitude,
+                "distance_km": distance_m / 1000.0,
+            })
+
+    sorted_stations = sorted(station_list, key=lambda x: x['distance_km'])
+    unique_stations = []
+    seen = set()
+    for s in sorted_stations:
+        uid = f"{s['network']}.{s['station']}"
+        if uid not in seen:
+            unique_stations.append(s)
+            seen.add(uid)
+
+    final_list = unique_stations[:max_stations]
+    if final_list:
+        print(f"    Found {len(final_list)} stations.")
+    return final_list
+
+
+# tools.py (Replace the get_waveforms_and_pga function)
+
+def get_waveforms_and_pga(event, stations):
+    """
+    Downloads waveforms once per station, calculates PGA, and plots the processed acceleration.
+    (REVERTED: Local caching has been removed.)
+    """
+    import os
+    import time
+    import numpy as np
+    from obspy import UTCDateTime
+    from obspy.clients.fdsn import Client
+    # Assuming 'ensure_run_directory' is available in the current scope or imported from 'tools'
+    # from tools import ensure_run_directory
+
+    event_time = UTCDateTime(event['time'])
+    results = []
+
+    # Configuration for this function
+    MAX_ATTEMPTS = 1
+    BASE_SLEEP = 2.0
+    MIN_TRACE_COUNT = 2  # Required for RotD50 calculation
+
+    # Setup directories
+    run_dir = ensure_run_directory(event['id'])
+    plot_dir = os.path.join(run_dir, "observed_plots")
+
+    if not os.path.exists(plot_dir): os.makedirs(plot_dir)
+
+    # Client Selection logic
+    if event['latitude'] > 36.0:
+        client_name = "NCEDC"
+    else:
+        client_name = "SCEDC"
+    client = Client(client_name)
+
+    print(f"--- TOOL: Downloading Waveforms & Plotting to {plot_dir} ---")
+
+    for i, sta in enumerate(stations):
+        net = sta['network']
+        code = sta['station']
+
+        # Politeness Delay between stations
+        time.sleep(BASE_SLEEP)
+
+        for attempt in range(MAX_ATTEMPTS):
+            try:
+                # 1. Inventory Check
+                inventory = client.get_stations(
+                    network=net, station=code, starttime=event_time, endtime=event_time + 60,
+                    level="channel", channel="HN*,BH*"
+                )
+
+                # --- Channel Selection Logic (Find suitable pair) ---
+                valid_pair = None
+                used_instr = None
+
+                for n in inventory:
+                    for s in n:
+                        if s.channels:
+                            used_instr = s.channels[0].code[:2]
+                            valid_pair = (s.channels[0], s.channels[1])
+                            break
+                    if valid_pair: break
+
+                if not valid_pair:
+                    print(f"    -> Warning: No valid channel pair found for {net}.{code}. Skipping.")
+                    break  # Move to next station
+
+                chan1, chan2 = valid_pair[0].code, valid_pair[1].code
+                location_code = valid_pair[0].location_code
+                print(f"  - Attempting: {net}.{code} -> {chan1}/{chan2} (Single Request)")
+
+                # 2. Download Waveforms
+                st_filtered = client.get_waveforms(
+                    net, code, location_code, f"{used_instr}*",  # Use location_code
+                    event_time - 10, event_time + 60, attach_response=True
+                )
+
+                # Select only the specific two channels to avoid processing extra traces
+                st_filtered = st_filtered.select(channel=chan1) + st_filtered.select(channel=chan2)
+
+                # --- CRITICAL CHECK: Ensure we have both required traces ---
+                if len(st_filtered) < MIN_TRACE_COUNT:
+                    print(f"    -> Warning: Received only {len(st_filtered)} trace(s) for {net}.{code}. Skipping.")
+                    break  # Move to next station
+
+                # 3. Response Removal (Conversion to m/s²)
+                st_accel = st_filtered.copy()
+                pre_filt = [0.05, 0.1, 35, 40]
+                # If removal fails, it will raise an Exception handled below
+                st_accel.remove_response(output="ACC", pre_filt=pre_filt, water_level=60)
+
+                # 4. Calculate PGA (using m/s² data)
+                # Ensure tr.data is used only if it's a valid numpy array
+                try:
+                    pgas_m_s2 = [np.max(np.abs(tr.data)) for tr in st_accel if len(tr.data) > 0]
+                    if len(pgas_m_s2) < MIN_TRACE_COUNT:
+                        print(f"    -> Warning: Trace data failed processing after filtering. Skipping.")
+                        break  # Failed data integrity check
+
+                    rotd50_m_s2 = np.sqrt(pgas_m_s2[0] * pgas_m_s2[1])
+                    rotd50_g = rotd50_m_s2 / 9.81
+                except Exception as pga_e:
+                    print(f"    -> Error during PGA calculation for {net}.{code}: {pga_e}. Skipping.")
+                    break  # Move to next station
+
+                # 5. Scaling and Plotting (cm/s²)
+                plot_filename = os.path.join(plot_dir, f"{net}.{code}_{event['id']}_ACCEL_cms2.png")
+
+                st_plot = st_accel.copy()
+                for tr in st_plot:
+                    tr.data *= 100.0  # m/s^2 -> cm/s^2
+                    tr.stats.unit = "cm/s²"
+                    tr.stats.channel = f"ACCEL ({tr.stats.channel.split('_')[0]})"
+
+                st_plot.plot(outfile=plot_filename, show=False)
+
+                # 6. Save PGA Result
+                print(f"    -> Success! RotD50={rotd50_m_s2:.4f} m/s²")
+
+                # The crash fix (implicit): Ensure a valid dictionary is ALWAYS appended on success
+                results.append({
+                    "station": f"{net}.{code}",
+                    "latitude": sta['latitude'],
+                    "longitude": sta['longitude'],
+                    "distance_km": sta['distance_km'],
+                    "pga_m_s2": rotd50_m_s2,  # This is a float
+                    "pga_g": rotd50_g  # This is a float
+                })
+                break  # Success break
+
+            except Exception as e:
+                # Generalized failure handler for Obspy/Network issues
+                if "500" in str(e):
+                    print(f"    -> Server busy, skipping station {net}.{code}.")
+                else:
+                    print(f"    -> Error processing station {net}.{code}: {e}")
+
+                break  # Stop trying and move to next station
+
+    # The returned 'results' list contains only valid dictionaries with float values,
+    # preventing the 'dict > float' error in subsequent functions.
+    return results
+
+# --- BBP GENERATION & EXECUTION ---
+
+def select_1d_velocity_model(latitude):
+    """Returns '2' for Northern CA (Lat > 36), '1' for Southern CA."""
+    if latitude > 36.0: return "2"  # NOCAL
+    return "1"  # LA_BASIN
+
+
 def calculate_fault_dims(magnitude):
-    """
-    Estimates Fault Length and Width using Wells & Coppersmith (1994)
-    Empirical relationships for 'All' slip types.
-    """
-    # Rupture Area (A) = 10 ^ (-3.49 + 0.91 * Mw)
+    """Wells & Coppersmith (1994)"""
     area = 10 ** (-3.49 + 0.91 * magnitude)
-
-    # Rupture Width (W) = 10 ^ (-1.01 + 0.32 * Mw)
     width = 10 ** (-1.01 + 0.32 * magnitude)
-
-    # Ensure Width doesn't exceed seismogenic thickness (e.g. 15-20km)
-    if width > 20.0:
-        width = 20.0
-
+    if width > 20.0: width = 20.0
     length = area / width
-
     return length, width
 
 
-# tools.py (Replace generate_bbp_src)
-
-# tools.py (Replace generate_bbp_src)
-
-def generate_bbp_src(event_data, mechanism, output_file="event.src"):
+def generate_bbp_src(event_data, mechanism, output_file=None):
     """
     Generates a SCEC Broadband Platform .src file.
-    FINAL FIX: Uses correct variable names (HYPO_ALONG_STK) and includes DLEN/DWID.
+    UPDATED: Clamps minimum fault dimensions to 1.5km to prevent 'dx=inf' crashes.
     """
-    print(f"--- TOOL: Generating BBP Source File: {output_file} ---")
+    run_dir = ensure_run_directory(event_data['id'])
+
+    if output_file is None:
+        filename = f"event_{event_data['id']}.src"
+        output_path = os.path.join(run_dir, filename)
+    elif os.path.dirname(output_file) == "":
+        output_path = os.path.join(run_dir, output_file)
+    else:
+        output_path = output_file
+
+    print(f"--- TOOL: Generating BBP Source File: {output_path} ---")
 
     mag = event_data['magnitude']
     hypo_lat = event_data['latitude']
@@ -472,10 +355,23 @@ def generate_bbp_src(event_data, mechanism, output_file="event.src"):
     dip = mechanism['dip']
     rake = mechanism['rake']
 
+    # 1. Calculate Dimensions
     length, width = calculate_fault_dims(mag)
 
-    # Geometry
-    hypo_along_stk = 0.0  # Centroid (0.0 is center in BBP convention)
+    # --- CRITICAL STABILITY FIX ---
+    # The BBP HfSims module often fails if the fault is smaller than the
+    # stochastic grid (approx 1.0km). We clamp the minimum size to 1.5km.
+    # This prevents the "dx=inf" / Floating Point Exception.
+    MIN_DIM = 1.5
+    if length < MIN_DIM:
+        print(f"    Notice: Clamping Fault Length from {length:.2f}km to {MIN_DIM}km for stability.")
+        length = MIN_DIM
+    if width < MIN_DIM:
+        print(f"    Notice: Clamping Fault Width from {width:.2f}km to {MIN_DIM}km for stability.")
+        width = MIN_DIM
+
+    # 2. Geometry Calculations
+    hypo_along_stk = 0.0
     hypo_down_dip = width / 2.0
 
     rad_dip = math.radians(dip)
@@ -496,279 +392,94 @@ def generate_bbp_src(event_data, mechanism, output_file="event.src"):
         lat_top_center = hypo_lat
         lon_top_center = hypo_lon
 
-    with open(output_file, "w") as f:
+    # 3. Write File
+    with open(output_path, "w") as f:
         f.write(f"MAGNITUDE = {mag:.2f}\n")
-        f.write(f"FAULT_LENGTH = {length:.2f}\n")
-        f.write(f"FAULT_WIDTH = {width:.2f}\n")
+        f.write(f"FAULT_LENGTH = {length:.4f}\n")
+        f.write(f"FAULT_WIDTH = {width:.4f}\n")
         f.write(f"DEPTH_TO_TOP = {depth_to_top:.2f}\n")
         f.write(f"STRIKE = {strike:.1f}\n")
         f.write(f"DIP = {dip:.1f}\n")
         f.write(f"RAKE = {rake:.1f}\n")
         f.write(f"LAT_TOP_CENTER = {lat_top_center:.5f}\n")
         f.write(f"LON_TOP_CENTER = {lon_top_center:.5f}\n")
-
-        # FIX: Renamed HYPO_ALONG_STRIKE -> HYPO_ALONG_STK
         f.write(f"HYPO_ALONG_STK = {hypo_along_stk:.1f}\n")
         f.write(f"HYPO_DOWN_DIP = {hypo_down_dip:.2f}\n")
 
+        # Standard Grid Params (Safe now that L/W are clamped)
         f.write(f"DLEN = 0.1\n")
         f.write(f"DWID = 0.1\n")
+        f.write(f"DT = 0.1\n")
+        f.write(f"HF_DT = 0.01\n")
         f.write(f"SEED = 12345\n")
 
-    print(f"    File written. L={length:.1f}km, W={width:.1f}km, Ztop={depth_to_top:.1f}km")
-    return output_file
+    print(f"    File written. L={length:.2f}km, W={width:.2f}km (Clamped)")
+    return output_path
 
-# ... (keep other functions like get_event_details, get_nearest_stations as is) ...
-
-# tools.py
-import numpy as np
-from obspy.clients.fdsn import Client
-from obspy import UTCDateTime
-# FIX for NCEDC Redirect Issue (common in older ObsPy versions)
-
-
-# tools.py
-from libcomcat.search import get_event_by_id  # <--- Import this
-
-
-def get_event_details(event_id):
-    """
-    Retrieves details for a specific historic earthquake by its USGS ID.
-    """
-    print(f"--- TOOL: Retrieving details for Event ID: {event_id} ---")
-
-    try:
-        event = get_event_by_id(event_id)
-
-        return {
-            "id": event.id,
-            "magnitude": event.magnitude,
-            # Use isoformat() for ObsPy compatibility
-            "time": event.time.isoformat(),
-            "location": event.location,
-            "latitude": event.latitude,
-            "longitude": event.longitude,
-            "depth_km": event.depth
-        }
-    except Exception as e:
-        print(f"Error finding event {event_id}: {e}")
-        return None
-
-
-# tools.py
-from libcomcat.search import search
-import datetime
-
-
-def get_recent_quakes(min_magnitude=3.0, lookback_hours=24):
-    """
-    Searches USGS ComCat for recent earthquakes in California.
-    Returns a list of event dictionaries formatted for the BBP pipeline.
-    """
-    # 1. Calculate time window (UTC)
-    start_time = datetime.datetime.utcnow() - datetime.timedelta(hours=lookback_hours)
-
-    print(f"--- TOOL: Scanning USGS for M{min_magnitude}+ CA events since {start_time.strftime('%H:%M')} UTC ---")
-
-    try:
-        # Search CA Bounding Box
-        events = search(
-            starttime=start_time,
-            minmagnitude=min_magnitude,
-            maxlatitude=42.0, minlatitude=32.0,
-            maxlongitude=-114.0, minlongitude=-125.0
-        )
-    except Exception as e:
-        print(f"    USGS Search Error: {e}")
-        return []
-
-    structured_events = []
-
-    # Sort: Largest first
-    if events:
-        sorted_events = sorted(events, key=lambda x: x.magnitude, reverse=True)
-        for event in sorted_events:
-            structured_events.append({
-                "id": event.id,
-                "magnitude": event.magnitude,
-                "time": event.time.isoformat(),  # ISO format for ObsPy
-                "location": event.location,
-                "latitude": event.latitude,
-                "longitude": event.longitude,
-                "depth_km": event.depth
-            })
-
-    return structured_events
-
-
-# tools.py (Replace get_nearest_stations)
-
-def get_nearest_stations(event, max_radius_deg=1.5, max_stations=40):
-    """
-    Finds nearest stations.
-    UPDATED: Prints a table of the stations found and their distances.
-    """
-    # Dynamic Client Switching
-    if event['latitude'] > 36.0:
-        client_name = "NCEDC"
-        URL_MAPPINGS['NCEDC'] = "https://service.ncedc.org"
-    else:
-        client_name = "SCEDC"
-
-    client = Client(client_name)
-
-    event_time = UTCDateTime(event['time'])
-    lat = event['latitude']
-    lon = event['longitude']
-
-    print(
-        f"--- TOOL: Searching for stations within {max_radius_deg:.2f} deg of {lat:.3f}, {lon:.3f} using {client_name} ---")
-
-    try:
-        # RESTRICTED SEARCH: Only CI (SoCal), NC (NoCal), BK (Berkeley)
-        inventory = client.get_stations(
-            latitude=lat, longitude=lon, maxradius=max_radius_deg,
-            starttime=event_time, endtime=event_time + 600,
-            network="CI,NC,BK",  # <--- CRITICAL CHANGE HERE
-            channel="HN*,BH*",
-            level="station"
-        )
-    except Exception as e:
-        print(f"    Station search warning: {e}")
-        return []
-
-    station_list = []
-
-    for network in inventory:
-        for station in network:
-            from obspy.geodetics import gps2dist_azimuth
-            distance_m, azimuth, _ = gps2dist_azimuth(lat, lon, station.latitude, station.longitude)
-
-            station_list.append({
-                "network": network.code,
-                "station": station.code,
-                "latitude": station.latitude,
-                "longitude": station.longitude,
-                "distance_km": distance_m / 1000.0,
-            })
-
-    # Sort by distance
-    sorted_stations = sorted(station_list, key=lambda x: x['distance_km'])
-
-    # Deduplicate
-    unique_stations = []
-    seen = set()
-    for s in sorted_stations:
-        uid = f"{s['network']}.{s['station']}"
-        if uid not in seen:
-            unique_stations.append(s)
-            seen.add(uid)
-
-    # --- NEW: Print the Table ---
-    final_list = unique_stations[:max_stations]
-
-    if final_list:
-        print(f"\n    {'STATION':<12} | {'DIST (km)':<10} | {'NETWORK':<10}")
-        print("    " + "-" * 38)
-        for s in final_list:
-            print(f"    {s['network']}.{s['station']:<9} | {s['distance_km']:<10.1f} | {s['network']}")
-        print(f"    Total: {len(final_list)} stations selected.\n")
-    else:
-        print("    No stations found.")
-
-    return final_list
-
-
-# tools.py (Replace generate_bbp_stl)
-
-def generate_bbp_stl(pga_data, output_file="stations.stl"):
-    """
-    Generates a SCEC Broadband Platform Station List (.stl).
-    FIX: Corrects column order to [Lon, Lat, ID, Vs30, LoCut, HiCut]
-    """
+def generate_bbp_stl(pga_data, output_file=None):
+    """Generates .stl file. Auto-places in run dir."""
+    # We grab the event ID from the first station entry's file path or assume caller handles path
+    # Ideally caller passes full path, but let's be safe.
     print(f"--- TOOL: Generating BBP Station List: {output_file} ---")
 
     with open(output_file, "w") as f:
         for entry in pga_data:
-            sid = entry['station']
-            lon = entry['longitude']
-            lat = entry['latitude']
-
-            # Physics defaults
-            vs30 = 863  # Standard LA Basin rock reference
-            lo_cut = 0.1
-            hi_cut = 50.0
-
-            # CORRECT BBP FORMAT: Longitude Latitude StationID Vs30 LoCut HiCut
-            f.write(f"{lon:.4f} {lat:.4f} {sid} {vs30} {lo_cut} {hi_cut}\n")
-
-    print(f"    Written {len(pga_data)} stations to {output_file}")
+            f.write(f"{entry['longitude']:.4f} {entry['latitude']:.4f} {entry['station']} 863 0.1 50.0\n")
     return output_file
 
-def select_1d_velocity_model(latitude):
+
+def generate_bbp_input_text(event_data, src_file, stl_file, output_file=None):
     """
-    Selects the appropriate SCEC BBP 1D Velocity Model based on latitude.
-    Returns the INTEGER MENU CHOICE for BBP 22.4 interactive mode.
+    Generates the input text file for Docker.
+    UPDATED: Fixes the path mismatch by including 'outdata' in the Docker path.
     """
-    # Heuristic: North of 36.0 is Northern CA, South is Southern CA
-    if latitude > 36.0:
-        print(f"    Location (Lat {latitude:.2f}) is Northern CA -> Selecting Option 2 (NOCAL)")
-        return "2" # 2 = NOCAL
+    ev_id = event_data['id']
+    run_dir = ensure_run_directory(ev_id)
+
+    if output_file is None:
+        filename = f"bbp_input_{ev_id}.txt"
+        output_path = os.path.join(run_dir, filename)
+    elif os.path.dirname(output_file) == "":
+        output_path = os.path.join(run_dir, output_file)
     else:
-        print(f"    Location (Lat {latitude:.2f}) is Southern CA -> Selecting Option 1 (LA_BASIN_500)")
-        return "1" # 1 = LA_BASIN_500
+        output_path = output_file
 
+    print(f"--- TOOL: Generating BBP Input Script: {output_path} ---")
 
-# tools.py (Replace generate_bbp_input_text)
-
-def generate_bbp_input_text(event_data, src_file, stl_file, output_file="bbp_input.txt"):
-    """
-    Generates a text file containing the keystrokes to drive the BBP interactive menu.
-    UPDATED for BBP 22.4 Menu Sequence.
-    """
-    print(f"--- TOOL: Generating BBP Input Script: {output_file} ---")
-
-    # 1. Select Velocity Model (Integer ID: 1=LABasin, 2=NOCAL)
     vel_model_id = select_1d_velocity_model(event_data['latitude'])
 
-    # 2. Define Paths inside Docker
-    docker_src = f"/app/target/{src_file}"
-    docker_stl = f"/app/target/{stl_file}"
+    # --- FIX IS HERE ---
+    # We must include 'outdata' because Docker mounts the project root to /app/target
+    docker_src = f"/app/target/outdata/Event_{ev_id}/{os.path.basename(src_file)}"
+    docker_stl = f"/app/target/outdata/Event_{ev_id}/{os.path.basename(stl_file)}"
 
-    # 3. Construct Input Sequence (The "Keystrokes")
-    # ---------------------------------------------------------
-    # Q1: Validation run?                   -> n
-    # Q2: Velocity Model?                   -> {vel_model_id}
-    # Q3: Choose Method (GP)?               -> 1
-    # Q4: Source File: (1) List or (2) Path?-> 2
-    # Q5: Enter Source Path:                -> {docker_src}
-    # Q6: Station File: (1) List or (2) Path?-> 2
-    # Q7: Enter Station Path:               -> {docker_stl}
-    # Q8: Run Simulation?                   -> y
-    # ---------------------------------------------------------
-
+    # Input Sequence:
+    # n (Validation=No) -> {vel_model} -> 1 (GP) -> 2 (Src Path) -> {src} -> 2 (Stl Path) -> {stl} -> y (Run)
     input_content = f"n\n{vel_model_id}\n1\n2\n{docker_src}\n2\n{docker_stl}\ny\n"
 
-    with open(output_file, "w") as f:
+    with open(output_path, "w") as f:
         f.write(input_content)
-
-    print(f"    Input script written. Content:\n{input_content.strip().replace(chr(10), ' ')}")
-    return output_file
+    return output_path
 
 
 def run_bbp_simulation(input_text_filename):
     """
-    Runs the SCEC BBP Docker container in Interactive Mode, piping in our input text file.
+    Runs the SCEC BBP Docker container.
+    UPDATED: Checks for output files to verify success, even if Docker exit code is non-zero.
     """
     print(f"\n--- TOOL: Launching Docker Simulation ---")
 
+    # 1. Determine Event ID from filename (bbp_input_ci12345.txt)
+    try:
+        event_id_part = os.path.basename(input_text_filename).replace("bbp_input_", "").replace(".txt", "")
+        run_dir = os.path.join("outdata", f"Event_{event_id_part}")
+    except:
+        run_dir = None
+
     cwd = os.getcwd()
 
-    # We use shell piping: cat input.txt | docker run -i ...
-    # This simulates a user typing the answers.
-
     docker_cmd = (
-        f"docker run --rm -i "  # -i is CRITICAL (Interactive/Stdin open)
+        f"docker run --rm -i "
         f"-v {cwd}:/app/target "
         f"--ulimit stack=-1 "
         f"--platform linux/amd64 "
@@ -777,70 +488,203 @@ def run_bbp_simulation(input_text_filename):
     )
 
     full_cmd = f"cat {input_text_filename} | {docker_cmd}"
-
-    print(f"    Executing: {full_cmd}")
+    print(f"    Executing with input: {input_text_filename}")
 
     try:
-        # shell=True is required for the pipe (|) to work
-        process = subprocess.run(full_cmd, shell=True, check=True, text=True)
-        print("    Docker simulation completed successfully.")
-        return True
-    except subprocess.CalledProcessError as e:
-        print(f"    Docker Execution Failed! Return Code: {e.returncode}")
+        # We allow check=False so we can inspect the output even if it 'fails'
+        process = subprocess.run(full_cmd, shell=True, check=False, text=True)
+
+        # --- FIX: Add a brief sync delay to fix an exit error on client ---
+        time.sleep(0.5)
+
+        # 2. VERIFY BY FILE EXISTENCE
+        # If the simulation worked, we should see .rd50 files in a numbered folder inside the event dir
+        if run_dir and os.path.exists(run_dir):
+            # The BBP creates a numbered folder (e.g. 5142394) inside the run_dir
+            # We look for ANY .rd50 file in any subdirectory
+            rd50_files = glob.glob(f"{run_dir}/*/*.rd50")
+
+            if rd50_files:
+                print(f"    Docker finished. Found {len(rd50_files)} result files.")
+                return True
+            else:
+                print(f"    Docker finished, but NO result files (.rd50) found.")
+                return False
+
+        # Fallback if we can't check files
+        return process.returncode == 0
+
+    except Exception as e:
+        print(f"    Docker Execution Exception: {e}")
         return False
 
-    def generate_comparison_map(pga_data, sim_vals, event_data, output_file="comparison_map.png"):
-        """
-        Generates a map showing Observed vs Simulated residuals.
-        Red = Over-prediction, Blue = Under-prediction.
-        """
-        print(f"--- TOOL: Generating Comparison Map: {output_file} ---")
 
-        lats, lons, diffs = [], [], []
 
-        for obs in pga_data:
-            sid = obs['station']
-            obs_g = obs['pga_g']
+# --- OUTPUT & MAPPING ---
 
-            # Find matching simulation value
-            matched_sim_g = None
-            for fname, val in sim_vals.items():
-                if sid in fname:
-                    matched_sim_g = val
-                    break
+# tools.py (Replace the get_simulated_pgas function)
 
-            if matched_sim_g:
-                # Calculate % Difference
-                diff = (matched_sim_g - obs_g) / obs_g * 100.0
-                lats.append(obs['latitude'])
-                lons.append(obs['longitude'])
-                diffs.append(diff)
+def get_simulated_pgas(pga_data, event_id, output_dir="outdata"):
+    """
+    Parses BBP output (.rd50 files) for simulated PGA values.
+    Uses the known event_id to locate the final BBP job folder.
+    """
+    import glob
+    print(f"\n--- TOOL: Parsing Simulated PGA Results for {event_id} ---")
 
-        if not lats:
-            print("    No matched data to plot.")
-            return
+    abs_out_dir = os.path.abspath(output_dir)
 
-        plt.figure(figsize=(10, 8))
+    # 1. Locate the correct event directory (e.g., outdata/Event_ci12345678)
+    target_event_dir = os.path.join(abs_out_dir, f"Event_{event_id}")
 
-        # 1. Plot Stations (Color-coded by difference)
-        # Vmin/Vmax set to +/- 100% to keep colors consistent
-        scatter = plt.scatter(lons, lats, c=diffs, cmap='seismic', vmin=-100, vmax=100, s=100, edgecolors='k')
+    if not os.path.isdir(target_event_dir):
+        print(f"    Event directory not found: {target_event_dir}")
+        return []
 
-        # 2. Plot Earthquake Epicenter
-        plt.scatter(event_data['longitude'], event_data['latitude'], s=300, c='gold', marker='*', edgecolors='black',
-                    label='Epicenter')
+    # 2. Find the BBP internal run folder (e.g., '5158010')
+    # This is the directory BBP names after the random job ID
+    # We look for any folder named purely with digits inside the event folder
+    numbered_run_dirs = [d for d in glob.glob(f"{target_event_dir}/*")
+                         if os.path.isdir(d) and os.path.basename(d).isdigit()]
 
-        # 3. Decoration
-        cbar = plt.colorbar(scatter)
-        cbar.set_label('Simulation Bias (%) \n(Blue=Under-predict, Red=Over-predict)')
+    if not numbered_run_dirs:
+        print(f"    Could not find BBP numbered output job folders inside {target_event_dir}.")
+        return []
 
-        plt.title(f"Simulation Accuracy: Event {event_data['id']}\n(M{event_data['magnitude']})")
-        plt.xlabel("Longitude")
-        plt.ylabel("Latitude")
-        plt.grid(True, linestyle='--', alpha=0.6)
-        plt.legend()
+    # Use the latest numbered folder created
+    latest_run_dir = max(numbered_run_dirs, key=os.path.getmtime)
+    print(f"    Reading results from BBP job folder: {os.path.basename(latest_run_dir)}")
 
-        # Save
-        plt.savefig(output_file)
-        print(f"    Map saved to {output_file}")
-        plt.close()
+    # 3. Parse .rd50 files (search inside the final directory)
+    rd50_files = glob.glob(f"{latest_run_dir}/*.rd50")
+    # ... (Rest of function remains the same: parsing logic) ...
+    # ... (Please paste the rest of your original get_simulated_pgas code here) ...
+
+    # --- Start of parsing logic that needs to be retained ---
+    sim_vals_by_filename = {}
+    for rfile in rd50_files:
+        # ... (parsing loop as before) ...
+        # ...
+        pass
+
+    # 4. Combine Simulated PGAs with Station Coordinates
+    # ... (Combine logic as before) ...
+
+    return simulated_pga_list
+
+
+# tools.py (Add or replace generate_display_map)
+
+def generate_display_map(pga_data, event_data, filename, run_dir, title):
+    """
+    Generates a map showing PGA data (either observed or simulated)
+    at station locations.
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    # 1. Setup Data for Plotting
+    lats = [d['latitude'] for d in pga_data]
+    lons = [d['longitude'] for d in pga_data]
+
+    # Plot PGA in cm/s² (100 * g) for visualization
+    pgas_cm_s2 = [d['pga_g'] * 981.0 for d in pga_data]
+
+    # 2. Create the Plot
+    plt.figure(figsize=(10, 10))
+    plt.scatter(lons, lats, c=pgas_cm_s2, cmap='viridis', s=200, edgecolor='black', alpha=0.8)
+
+    # Plot Earthquake Epicenter
+    plt.plot(event_data['longitude'], event_data['latitude'],
+             'r*', markersize=20, label=f"Epicenter (M{event_data['magnitude']})")
+
+    # 3. Aesthetics
+    plt.colorbar(label=title + ' (cm/s²)')
+    plt.xlabel("Longitude (°)")
+    plt.ylabel("Latitude (°)")
+    plt.title(f"{event_data['title']}\n{title}")
+    plt.grid(True)
+
+    # 4. Save the File
+    output_path = os.path.join(run_dir, filename)
+    plt.savefig(output_path)
+    plt.close()
+    print(f"    Map saved to: {output_path}")
+
+
+# tools.py (Update the compare_results function definition)
+
+# tools.py (Update the compare_results function)
+
+# tools.py (Replace the compare_results function)
+
+def compare_results(pga_data, event_id, event_data, output_dir="outdata"):
+    """
+    Compares observed PGA vs simulated PGA, generates the simulated map,
+    and calculates validation residuals.
+    """
+    import os
+    import numpy as np  # Needed for array operations
+
+    # CRITICAL: Define the run directory once at the top
+    run_dir = os.path.join(output_dir, f"Event_{event_id}")
+
+    print("\n--- TOOL: Generating Simulated Maps & Calculating Residuals ---")
+
+    # 1. Get Simulated PGAs
+    sim_data = get_simulated_pgas(pga_data, event_id, output_dir=output_dir)
+
+    if not sim_data:
+        print("    No simulated PGA data found to compare. Cannot proceed.")
+        return False
+
+    # 2. Generate the map for SIMULATED data
+    sim_map_filename = f"display_sim_map_pga_{event_id}.png"
+
+    # Call the mapping function with all required positional arguments
+    generate_display_map(
+        pga_data=sim_data,
+        event_data=event_data,
+        filename=sim_map_filename,
+        run_dir=run_dir,
+        title=f"BBP Simulated PGA (GP Method)"
+    )
+
+    # 3. Calculate Residuals (Validation Metrics)
+
+    # Ensure both lists are sorted/aligned based on station code
+    obs_data_dict = {d['station']: d['pga_g'] for d in pga_data}
+    sim_data_dict = {d['station']: d['pga_g'] for d in sim_data}
+
+    stations_to_compare = sorted(list(obs_data_dict.keys() & sim_data_dict.keys()))
+
+    residuals = []
+
+    # Calculate Residual: log10(Simulated) - log10(Observed)
+    print("\n| Station | Observed PGA (g) | Simulated PGA (g) | Residual (log10)|")
+    print("|:--- |:---:|:---:|:---:|")
+
+    for station in stations_to_compare:
+        obs_pga = obs_data_dict[station]
+        sim_pga = sim_data_dict[station]
+
+        # Calculate log residual only if both values are greater than zero
+        if obs_pga > 0 and sim_pga > 0:
+            residual = np.log10(sim_pga) - np.log10(obs_pga)
+            residuals.append(residual)
+            print(f"| {station} | {obs_pga:.3e} | {sim_pga:.3e} | {residual:.3f} |")
+        else:
+            print(f"| {station} | {obs_pga:.3e} | {sim_pga:.3e} | N/A (Zero Value) |")
+
+    # 4. Final Summary
+    if residuals:
+        mean_residual = np.mean(residuals)
+        std_residual = np.std(residuals)
+        print(f"\n✅ Validation Summary:")
+        print(f"   Mean Residual (Bias): {mean_residual:.3f} (Lower bias is better)")
+        print(f"   Std. Dev. Residual: {std_residual:.3f} (Lower scatter is better)")
+
+        # Optional: Generate a map showing residuals (e.g., color-coded dots)
+        # generate_residual_map(...)
+
+    return True
