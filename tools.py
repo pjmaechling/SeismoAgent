@@ -509,46 +509,72 @@ def generate_bbp_input_text(event_data, src_file, stl_file, output_file=None):
     return output_path
 
 
+import os
+import subprocess
+import glob
+import time
+
+
 def run_bbp_simulation(input_text_filename):
     """
     Runs the SCEC BBP Docker container.
-    UPDATED: Checks for output files to verify success, even if Docker exit code is non-zero.
+    FIXED: 'cat' uses Host Path, Docker Volume uses Project Root.
     """
+    import os
+    import subprocess
+    import glob
+    import time
+
     print(f"\n--- TOOL: Launching Docker Simulation ---")
 
-    # 1. Determine Event ID from filename (bbp_input_ci12345.txt)
+    # 1. Determine Paths
     try:
+        # Host Path (Absolute) to Project Root
+        # We assume the script is running from the project root
+        host_project_root_abs = os.path.abspath(os.getcwd())
+
+        # Container Mount Point
+        container_mount_point = "/app/target"
+
+        # Determine Event ID (for verification later)
         event_id_part = os.path.basename(input_text_filename).replace("bbp_input_", "").replace(".txt", "")
+
+        # Directory where we expect results on the Host
         run_dir = os.path.join("outdata", f"Event_{event_id_part}")
-    except:
-        run_dir = None
 
-    cwd = os.getcwd()
+    except Exception as e:
+        print(f"    Path determination error: {e}")
+        return False
 
+    # 2. Construct Docker Command
+    # -v maps the WHOLE project to /app/target
+    # This ensures that /app/target/outdata/... matches host outdata/...
     docker_cmd = (
         f"docker run --rm -i "
-        f"-v {cwd}:/app/target "
+        f"-v {host_project_root_abs}:{container_mount_point} "
         f"--ulimit stack=-1 "
         f"--platform linux/amd64 "
         f"sceccode/bbp_22_4:latest "
         f"/home/scecuser/bbp/bbp/comps/run_bbp.py"
     )
 
+    # 3. Execute
+    # CRITICAL FIX: 'cat' runs on the Host, so it needs the HOST path (input_text_filename)
+    # The output is piped INTO Docker, which is what we want.
     full_cmd = f"cat {input_text_filename} | {docker_cmd}"
-    print(f"    Executing with input: {input_text_filename}")
+
+    # Debug print to confirm what we are running
+    print(f"    Host Input File: {input_text_filename}")
+    # print(f"    Command: {full_cmd}")
 
     try:
-        # We allow check=False so we can inspect the output even if it 'fails'
-        process = subprocess.run(full_cmd, shell=True, check=False, text=True)
+        # Run process
+        process = subprocess.run(full_cmd, shell=True, check=False, text=True, capture_output=True)
+        time.sleep(1.0)  # Brief sync pause
 
-        # --- FIX: Add a brief sync delay to fix an exit error on client ---
-        time.sleep(0.5)
-
-        # 2. VERIFY BY FILE EXISTENCE
-        # If the simulation worked, we should see .rd50 files in a numbered folder inside the event dir
+        # 4. Verify Success
         if run_dir and os.path.exists(run_dir):
-            # The BBP creates a numbered folder (e.g. 5142394) inside the run_dir
-            # We look for ANY .rd50 file in any subdirectory
+            # Look for ANY .rd50 file in the BBP numeric subfolders
             rd50_files = glob.glob(f"{run_dir}/*/*.rd50")
 
             if rd50_files:
@@ -556,9 +582,11 @@ def run_bbp_simulation(input_text_filename):
                 return True
             else:
                 print(f"    Docker finished, but NO result files (.rd50) found.")
+                # Print stderr to see why BBP failed (if it wasn't the 'cat' error)
+                if process.stderr:
+                    print(f"    Docker Stderr: {process.stderr[:500]}...")
                 return False
 
-        # Fallback if we can't check files
         return process.returncode == 0
 
     except Exception as e:
@@ -566,31 +594,36 @@ def run_bbp_simulation(input_text_filename):
         return False
 
 
+import os
+import glob
+import time # Needed for os.path.getmtime
 
-# --- OUTPUT & MAPPING ---
-
-# tools.py (Replace the get_simulated_pgas function)
 
 def get_simulated_pgas(pga_data, event_id, output_dir="outdata"):
     """
     Parses BBP output (.rd50 files) for simulated PGA values.
-    Uses the known event_id to locate the final BBP job folder.
     """
+    import os
     import glob
+
     print(f"\n--- TOOL: Parsing Simulated PGA Results for {event_id} ---")
 
+    # 1. Locate the correct event directory
+    # FIX: Ensure we don't double-nest (e.g. outdata/Event_X/Event_X)
+    # We assume output_dir is relative ("outdata") or absolute.
+
+    cwd = os.getcwd()
+    # If output_dir is relative, this makes it absolute: /path/to/project/outdata
     abs_out_dir = os.path.abspath(output_dir)
 
-    # 1. Locate the correct event directory (e.g., outdata/Event_ci12345678)
+    # Construct: /path/to/project/outdata/Event_ci38443303
     target_event_dir = os.path.join(abs_out_dir, f"Event_{event_id}")
-
+    target_event_dir = "outdata"
     if not os.path.isdir(target_event_dir):
         print(f"    Event directory not found: {target_event_dir}")
         return []
 
-    # 2. Find the BBP internal run folder (e.g., '5158010')
-    # This is the directory BBP names after the random job ID
-    # We look for any folder named purely with digits inside the event folder
+    # 2. Find the BBP internal run folder (numeric folder)
     numbered_run_dirs = [d for d in glob.glob(f"{target_event_dir}/*")
                          if os.path.isdir(d) and os.path.basename(d).isdigit()]
 
@@ -598,74 +631,139 @@ def get_simulated_pgas(pga_data, event_id, output_dir="outdata"):
         print(f"    Could not find BBP numbered output job folders inside {target_event_dir}.")
         return []
 
-    # Use the latest numbered folder created
+    # Use the latest numbered folder
+    #print(numbered_run_dirs)
     latest_run_dir = max(numbered_run_dirs, key=os.path.getmtime)
+    #print(latest_run_dir)
     print(f"    Reading results from BBP job folder: {os.path.basename(latest_run_dir)}")
 
-    # 3. Parse .rd50 files (search inside the final directory)
+    # 3. Parse .rd50 files
     rd50_files = glob.glob(f"{latest_run_dir}/*.rd50")
-    # ... (Rest of function remains the same: parsing logic) ...
-    # ... (Please paste the rest of your original get_simulated_pgas code here) ...
+    sim_pgas_by_station = {}
 
-    # --- Start of parsing logic that needs to be retained ---
-    sim_vals_by_filename = {}
+    if not rd50_files:
+        print("    No .rd50 result files found.")
+        return []
+    else:
+        print(rd50_files)
+
     for rfile in rd50_files:
-        # ... (parsing loop as before) ...
-        # ...
-        pass
+        fname = os.path.basename(rfile)
+        station_id = fname.split('.')[1]
 
-    # 4. Combine Simulated PGAs with Station Coordinates
-    # ... (Combine logic as before) ...
+        with open(rfile, 'r') as f:
+            for line in f:
+                if line.startswith('#'): continue
+                parts = line.split()
+                try:
+                    # Period < 0.02 is treated as PGA
+                    if float(parts[0]) < 0.02:
+                        sim_pgas_by_station[station_id] = float(parts[1])
+                        break
+                except:
+                    continue
 
+    # 4. Align with Observed Data
+    simulated_pga_list = []
+    print(sim_pgas_by_station)
+    print(pga_data)
+    for obs in pga_data:
+        sid = obs['station']
+        sid = sid.split('.')[1]
+        if sid in sim_pgas_by_station:
+            sim_pga_g = sim_pgas_by_station[sid]
+            simulated_pga_list.append({
+                "station": sid,
+                "latitude": obs['latitude'],
+                "longitude": obs['longitude'],
+                "distance_km": obs['distance_km'],
+                "pga_g": sim_pga_g,
+                "pga_m_s2": sim_pga_g * 9.81
+            })
+
+    print(simulated_pga_list)
     return simulated_pga_list
-
-
 # tools.py (Add or replace generate_display_map)
 
 def generate_display_map(pga_data, event_data, filename, run_dir, title):
     """
     Generates a map showing PGA data (either observed or simulated)
-    at station locations.
+    at station locations, with added geographic context (basemap).
     """
+    import os
     import matplotlib.pyplot as plt
     import numpy as np
+    import pandas as pd  # <-- NEW: For easier data handling
+    import contextily as cx  # <-- NEW: For geographic context
 
     # 1. Setup Data for Plotting
-    lats = [d['latitude'] for d in pga_data]
-    lons = [d['longitude'] for d in pga_data]
+    # Convert list of dicts to DataFrame for easy manipulation
+    df = pd.DataFrame(pga_data)
 
-    # Plot PGA in cm/s² (100 * g) for visualization
-    pgas_cm_s2 = [d['pga_g'] * 981.0 for d in pga_data]
+    # Calculate PGA in cm/s² for visualization
+    df['pgas_cm_s2'] = df['pga_g'] * 981.0
 
-    # 2. Create the Plot
-    plt.figure(figsize=(10, 10))
-    plt.scatter(lons, lats, c=pgas_cm_s2, cmap='viridis', s=200, edgecolor='black', alpha=0.8)
+    # 2. Create the Plot and Axes
+    fig, ax = plt.subplots(figsize=(10, 10))
+
+    # Calculate map extent with small padding
+    pad = 0.05
+    lat_min, lat_max = df['latitude'].min() - pad, df['latitude'].max() + pad
+    lon_min, lon_max = df['longitude'].min() - pad, df['longitude'].max() + pad
+
+    # 3. Plot Data (in native Lat/Lon: EPSG:4326)
+    scatter = ax.scatter(
+        df['longitude'],
+        df['latitude'],
+        c=df['pgas_cm_s2'],
+        cmap='viridis',
+        s=150,  # Slightly larger for visibility over basemap
+        edgecolor='black',
+        alpha=0.8
+    )
 
     # Plot Earthquake Epicenter
-    plt.plot(event_data['longitude'], event_data['latitude'],
-             'r*', markersize=20, label=f"Epicenter (M{event_data['magnitude']})")
+    ax.plot(
+        event_data['longitude'],
+        event_data['latitude'],
+        'r*',
+        markersize=25,
+        markeredgecolor='black',
+        label=f"Epicenter (M{event_data['magnitude']})"
+    )
 
-    # 3. Aesthetics
-    print("before title",title,type(title))
-    plt.colorbar(label=title + ' (cm/s²)')
-    plt.xlabel("Longitude (°)")
-    plt.ylabel("Latitude (°)")
-    #plt.title(f"{event_data['title']}\n{title}")
-    plt.title(f"{title}")
-    plt.grid(True)
+    # Set Axes Limits (Crucial before adding basemap)
+    ax.set_xlim(lon_min, lon_max)
+    ax.set_ylim(lat_min, lat_max)
 
-    # 4. Save the File
+    # 4. Add Geographic Context Layer (Basemap)
+    # This automatically converts the axis to Web Mercator (EPSG:3857) and overlays the tiles.
+    cx.add_basemap(
+        ax,
+        crs='EPSG:4326',  # Tell contextily that the data/limits are WGS84 (Lat/Lon)
+        source=cx.providers.OpenStreetMap.Mapnik,  # Use a standard, reliable OSM provider
+        #source=cx.providers.Stamen.TerrainBackground,  # Good balance of roads and terrain
+        zoom='auto'
+    )
+
+    # 5. Final Touches
+    # Use the 'title' from event_data for a full description (assuming you fixed the crash)
+    full_title = f"{event_data.get('title', 'Unknown Event')}\n{title}"
+
+    plt.colorbar(scatter, label=f"PGA (cm/s²)", orientation='vertical')
+    ax.set_xlabel("Longitude (°)")
+    ax.set_ylabel("Latitude (°)")
+    ax.set_title(full_title)
+    ax.legend()
+    # The basemap provides context, so the grid is less critical and removed here
+
+    # 6. Save the File
     output_path = os.path.join(run_dir, filename)
-    plt.savefig(output_path)
-    plt.close()
+    plt.savefig(output_path, bbox_inches='tight', dpi=300)  # Increased DPI for map quality
+    plt.close(fig)
     print(f"    Map saved to: {output_path}")
 
-
-# tools.py (Update the compare_results function definition)
-
-# tools.py (Update the compare_results function)
-
-# tools.py (Replace the compare_results function)
+    return output_path
 
 def compare_results(pga_data, event_id, event_data, output_dir="outdata"):
     """
@@ -678,10 +776,10 @@ def compare_results(pga_data, event_id, event_data, output_dir="outdata"):
     # CRITICAL: Define the run directory once at the top
     run_dir = os.path.join(output_dir, f"Event_{event_id}")
 
-    print("\n--- TOOL: Generating Simulated Maps & Calculating Residuals ---")
+    print("\n--- TOOL: Generating Simulated Maps & Calculating Residuals ---" , run_dir)
 
     # 1. Get Simulated PGAs
-    sim_data = get_simulated_pgas(pga_data, event_id, output_dir=output_dir)
+    sim_data = get_simulated_pgas(pga_data, event_id, output_dir=run_dir)
 
     if not sim_data:
         print("    No simulated PGA data found to compare. Cannot proceed.")
@@ -690,10 +788,9 @@ def compare_results(pga_data, event_id, event_data, output_dir="outdata"):
     # 2. Generate the map for SIMULATED data
     sim_map_filename = f"display_sim_map_pga_{event_id}.png"
 
-    # Call the mapping function with all required positional arguments
     generate_display_map(
         pga_data=sim_data,
-        event_data=event_data,
+        event_data=event_data,  # <-- CORRECT: Pass the main event metadata dict
         filename=sim_map_filename,
         run_dir=run_dir,
         title=f"BBP Simulated PGA (GP Method)"
@@ -735,5 +832,28 @@ def compare_results(pga_data, event_id, event_data, output_dir="outdata"):
 
         # Optional: Generate a map showing residuals (e.g., color-coded dots)
         # generate_residual_map(...)
+
+    # Inside compare_results, after Final Summary:
+
+    # 5. Generate Residual Map
+    residual_map_data = []
+    for station, residual in zip(stations_to_compare, residuals):
+        # Find original coordinates from the obs_data_dict
+        original_obs = obs_data_dict[station]
+
+        residual_map_data.append({
+            'latitude': original_obs['latitude'],
+            'longitude': original_obs['longitude'],
+            'pga_g': residual  # Plotting the residual value!
+        })
+
+    if residual_map_data:
+        generate_display_map(
+            pga_data=residual_map_data,
+            event_data=event_data,
+            filename=f"display_residual_map_{event_id}.png",
+            run_dir=run_dir,
+            title="PGA Residuals (log10(Sim) - log10(Obs))"
+        )
 
     return True

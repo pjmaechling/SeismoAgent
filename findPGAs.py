@@ -3,8 +3,8 @@ from tools import (get_event_details, get_nearest_stations, get_waveforms_and_pg
                    get_mechanism, generate_bbp_src, generate_bbp_stl,
                    generate_bbp_input_text, run_bbp_simulation, compare_results)
 
-TARGET_EVENT_ID = "ci15481673" # La Habra M5.1
-#TARGET_EVENT_ID = "ci38443303" # Example: Ridgecrest M7.1
+#TARGET_EVENT_ID = "ci15481673" # La Habra M5.1
+TARGET_EVENT_ID = "ci38443303" # Example: Ridgecrest M7.1
 #TARGET_EVENT_ID = "ci41134895" # Newport Inglewood M3.1
 
 def run_agent_workflow():
@@ -29,7 +29,7 @@ def run_agent_workflow():
     # 5. Station List
     # --- FIX: Save to outdata/Event_ID/ ---
     stl_path = os.path.join("outdata", f"Event_{TARGET_EVENT_ID}", f"event_{TARGET_EVENT_ID}.stl")
-    generate_bbp_stl(pga_data, output_file=stl_path)
+    generate_bbp_stl(target_event,stations, output_file=stl_path)
 
     # 6. Input Script
     input_file = generate_bbp_input_text(target_event, src_file, stl_path)
@@ -39,10 +39,10 @@ def run_agent_workflow():
 
     if success:
         print(f"\n✅ AGENT SUCCESS: {TARGET_EVENT_ID}")
-        compare_results(pga_data, TARGET_EVENT_ID, target_event)
     else:
         print("\n❌ AGENT FAILURE: Simulation did not complete.")
 
+    compare_results(pga_data, TARGET_EVENT_ID, target_event)
 
 if __name__ == "__main__":
     run_agent_workflow()

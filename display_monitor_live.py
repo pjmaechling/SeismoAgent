@@ -88,7 +88,6 @@ def run_live_workflow(event):
 
     if not success:
         print("❌ BBP Simulation failed.")
-        return
 
     # ------------------------------------------------------------------
     # 7. Compare Results and Generate Map 2
