@@ -80,13 +80,12 @@ The system operates across three distinct modes, each defined by its own primary
 
 2.  **Set up the Python Environment:**
     ```bash
-    # Recommended: Create a virtual environment
-    python3 -m venv venv
-    source venv/bin/activate
-    
-    # Install dependencies
-    pip install libcomcat obspy docker numpy matplotlib contextily
-    ```
+# 1. Create and activate
+conda create -n seismo python=3.10
+conda activate seismo
+
+# 2. Install dependencies
+conda install -c conda-forge numpy obspy matplotlib contextily libcomcat docker
 
 3.  **Pull the Simulation Engine:**
     This step downloads the physics codes and velocity models (approx. 24GB).

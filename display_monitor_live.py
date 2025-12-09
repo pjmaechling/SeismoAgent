@@ -18,38 +18,33 @@ CHECK_INTERVAL_SECONDS = 600  # Check every 10 minutes
 
 # display_monitor_live.py (Replace the run_live_workflow function)
 
+# display_monitor_live.py (Replace the run_live_workflow function)
+
+# display_monitor_live.py (Replace the run_live_workflow function)
+
 def run_live_workflow(event):
     """
     Executes the Dual-Map Display Pipeline for a single real-time event.
     """
     ev_id = event['id']
 
-    # 1. Get Mechanism & Source File (generate_bbp_src assigns src_file)
-    mechanism = get_mechanism(ev_id)
+    # 🚨 FIX 1: DEFINE run_dir (Needed for file paths and mapping)
+    run_dir = os.path.join("outdata", f"Event_{ev_id}")
 
-    # If you use the type-check guard (which is still good practice):
-    if not isinstance(mechanism, dict):
-        print("    >> Mechanism failed retrieval. Applying safe default.")
-        mechanism = {'strike': 0.0, 'dip': 90.0, 'rake': 0.0, 'source_type': 'FALLBACK'}
-
-    src_file = generate_bbp_src(event, mechanism)
-
-    # 2. Get Stations & Velocity Model (select_1d_velocity_model assigns vm_file)
-    #stations = get_nearest_stations(event, radius_deg=RADIUS_DEG)
+    # 2. Get Stations & Velocity Model
     stations = get_nearest_stations(event, max_radius_deg=RADIUS_DEG)
-    vm_file = select_1d_velocity_model(event)
 
-    # 3. Get Observed PGAs (get_waveforms_and_pga assigns observed_pga_data)
-    observed_pga_data = get_waveforms_and_pga(ev_id, event, stations)  # <-- ASSIGNS observed_pga_data
+    # 3. Get Observed PGAs
+    observed_pga_data = get_waveforms_and_pga(event, stations)
 
     if not observed_pga_data:
         print("❌ No valid observed PGA data could be retrieved. Halting workflow.")
         return
 
+    # --- Data Validation Filter ---
     valid_observed_data = []
     for item in observed_pga_data:
         # Only keep results that are dictionaries AND have the 'pga_g' key
-        # (ensuring a successful calculation occurred)
         if isinstance(item, dict) and 'pga_g' in item:
             valid_observed_data.append(item)
         else:
@@ -58,28 +53,37 @@ def run_live_workflow(event):
     if not valid_observed_data:
         print("❌ All observed PGA data failed validation. Halting workflow.")
         return
+    # ------------------------------
 
-    # --- Suggested addition to run_live_workflow before step 6 ---
     # Generate Map 1: Observed Data
+    # 🚨 FIX 2a: Pass valid_observed_data and the defined run_dir
     generate_display_map(
-        pga_data=observed_pga_data,
+        pga_data=valid_observed_data,
         event_data=event,
         filename=f"display_obs_map_pga_{ev_id}.png",
         run_dir=run_dir,
         title=f"Observed PGA (RotD50)"
     )
-    # -------------------------------------------------------------
 
-    # 4. Generate Station List File (generate_bbp_stl assigns stl_file)
-    stl_file = generate_bbp_stl(ev_id, stations)
+    # 4. Generate Station List File
+    stl_file = generate_bbp_stl(event, stations)
 
-    # 5. Generate BBP Input File (generate_bbp_input_text assigns input_file)
-    input_file = generate_bbp_input_text(ev_id, event, src_file, stl_file, vm_file)  # <-- ASSIGNS input_file
+    # Get Mechanism & Source File
+    mechanism = get_mechanism(ev_id)
+
+    # Mechanism guard (Good Practice)
+    if not isinstance(mechanism, dict):
+        print("    >> Mechanism failed retrieval. Applying safe default.")
+        mechanism = {'strike': 0.0, 'dip': 90.0, 'rake': 0.0, 'source_type': 'FALLBACK'}
+
+    src_file = generate_bbp_src(event, mechanism)
+
+    # 5. Generate BBP Input File
+    input_file = generate_bbp_input_text(event, src_file, stl_file)
 
     # ------------------------------------------------------------------
     # 6. Run Docker
     print(f"    >> Launching BBP Physics Engine...")
-    # input_file is USED here:
     success = run_bbp_simulation(input_file)
 
     if not success:
@@ -88,12 +92,11 @@ def run_live_workflow(event):
 
     # ------------------------------------------------------------------
     # 7. Compare Results and Generate Map 2
-    # observed_pga_data is USED here:
-    compare_results(observed_pga_data, ev_id, event)
+    # 🚨 FIX 2b: Pass the validated data set (valid_observed_data) to comparison
+    compare_results(valid_observed_data, ev_id, event)
 
     print(f"✅ COMPLETED: {ev_id}")
-    print(f"   Maps saved to outdata/Event_{ev_id}/")
-
+    print(f"   Maps saved to {run_dir}/")
 
 def start_live_monitor():
     print(f"--- SEISMO AGENT: LIVE DISPLAY MONITOR ---")

@@ -127,12 +127,13 @@ def get_nearest_stations(event, max_radius_deg=1.5, max_stations=40):
     event_time = UTCDateTime(event['time'])
 
     print(f"--- TOOL: Searching stations ({max_radius_deg:.2f} deg) using {client_name} ---")
-
+    print("Event:", event)
+    print("RADIUS_Deg:", max_radius_deg)
     try:
         inventory = client.get_stations(
             latitude=event['latitude'], longitude=event['longitude'],
             maxradius=max_radius_deg, starttime=event_time, endtime=event_time + 600,
-            network="CI,NC,BK,CE,NP", channel="HN*,BH*", level="station"
+            network="CI,NC,BK", channel="HN*,BH*,EH*", level="station"
         )
     except Exception as e:
         print(f"    Station search warning: {e}")
@@ -181,10 +182,10 @@ def get_waveforms_and_pga(event, stations):
     from obspy.clients.fdsn import Client
     # Assuming 'ensure_run_directory' is available in the current scope or imported from 'tools'
     # from tools import ensure_run_directory
-
+    #print ("before Datetime")
     event_time = UTCDateTime(event['time'])
     results = []
-
+    #print("before configuration for this function and setup rundirs")
     # Configuration for this function
     MAX_ATTEMPTS = 1
     BASE_SLEEP = 2.0
@@ -193,7 +194,7 @@ def get_waveforms_and_pga(event, stations):
     # Setup directories
     run_dir = ensure_run_directory(event['id'])
     plot_dir = os.path.join(run_dir, "observed_plots")
-
+    #print("before test for path",plot_dir)
     if not os.path.exists(plot_dir): os.makedirs(plot_dir)
 
     # Client Selection logic
@@ -314,9 +315,11 @@ def get_waveforms_and_pga(event, stations):
 
 # --- BBP GENERATION & EXECUTION ---
 
-def select_1d_velocity_model(latitude):
+def select_1d_velocity_model(event):
+    # print("event[lat]",event['latitude'])
     """Returns '2' for Northern CA (Lat > 36), '1' for Southern CA."""
-    if latitude > 36.0: return "2"  # NOCAL
+    # hard code this to southern california until GF for NorCal are added
+    if event['latitude'] > 36.0: return "1"  # NOCAL
     return "1"  # LA_BASIN
 
 
@@ -416,16 +419,57 @@ def generate_bbp_src(event_data, mechanism, output_file=None):
     print(f"    File written. L={length:.2f}km, W={width:.2f}km (Clamped)")
     return output_path
 
-def generate_bbp_stl(pga_data, output_file=None):
-    """Generates .stl file. Auto-places in run dir."""
-    # We grab the event ID from the first station entry's file path or assume caller handles path
-    # Ideally caller passes full path, but let's be safe.
-    print(f"--- TOOL: Generating BBP Station List: {output_file} ---")
+def generate_bbp_stl(event_data, stations,output_file=None):
+    """
+        Generates the SCEC Broadband Platform Station List (.stl) file.
 
-    with open(output_file, "w") as f:
-        for entry in pga_data:
-            f.write(f"{entry['longitude']:.4f} {entry['latitude']:.4f} {entry['station']} 863 0.1 50.0\n")
-    return output_file
+        Args:
+            event (obj): The unique ID of the earthquake event.
+            stations (list): List of dictionaries, each describing a station.
+
+        Returns:
+            str: The full path to the generated .stl file.
+        """
+    import os
+
+    run_dir = ensure_run_directory(event_data['id'])
+    #print("rundir",run_dir)
+
+    if output_file is None:
+        filename = f"event_{event_data['id']}.stl"
+        output_path = os.path.join(run_dir, filename)
+    elif os.path.dirname(output_file) == "":
+        output_path = os.path.join(run_dir, output_file)
+    else:
+        output_path = output_file
+
+    print(f"--- TOOL: Generating BBP Source File: {output_path} ---")
+
+    # Ensure run_dir exists (assuming you have an ensure_run_directory function)
+    if not os.path.exists(run_dir): os.makedirs(run_dir)
+
+    print(f"--- TOOL: Generating BBP Station List: {output_path} ---")
+
+    # 2. Write File Content
+    try:
+        with open(output_path, "w") as f:
+            # BBP STL files often require a header, followed by station data
+            f.write("# Station List File\n")
+            f.write("# STA NET LOC LAT LON \n")
+
+            for sta in stations:
+                # The format must match what BBP expects (typically space or comma separated)
+                #f.write(f"{sta['station']} {sta['network']} -- {sta['latitude']} {sta['longitude']}\n")
+                f.write(f"{sta['longitude']} {sta['latitude']} {sta['station']}\n")
+        print(f"    Station List file written successfully.")
+
+        # 3. Return the file path (The Fix!)
+        return output_path
+
+    except Exception as e:
+        print(f"    Error writing Station List file: {e}")
+        # Return a non-Path value (e.g., None) if it fails
+        return None
 
 
 def generate_bbp_input_text(event_data, src_file, stl_file, output_file=None):
@@ -445,8 +489,11 @@ def generate_bbp_input_text(event_data, src_file, stl_file, output_file=None):
         output_path = output_file
 
     print(f"--- TOOL: Generating BBP Input Script: {output_path} ---")
-
-    vel_model_id = select_1d_velocity_model(event_data['latitude'])
+    #print(event_data)
+    #print(src_file)
+    #print(stl_file)
+    #print(ev_id)
+    vel_model_id = select_1d_velocity_model(event_data)
 
     # --- FIX IS HERE ---
     # We must include 'outdata' because Docker mounts the project root to /app/target
@@ -599,10 +646,12 @@ def generate_display_map(pga_data, event_data, filename, run_dir, title):
              'r*', markersize=20, label=f"Epicenter (M{event_data['magnitude']})")
 
     # 3. Aesthetics
+    print("before title",title,type(title))
     plt.colorbar(label=title + ' (cm/s²)')
     plt.xlabel("Longitude (°)")
     plt.ylabel("Latitude (°)")
-    plt.title(f"{event_data['title']}\n{title}")
+    #plt.title(f"{event_data['title']}\n{title}")
+    plt.title(f"{title}")
     plt.grid(True)
 
     # 4. Save the File
