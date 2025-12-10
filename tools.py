@@ -799,7 +799,7 @@ def compare_results(pga_data, event_id, event_data, output_dir="outdata"):
     # 3. Calculate Residuals (Validation Metrics)
 
     # Ensure both lists are sorted/aligned based on station code
-    obs_data_dict = {d['station']: d['pga_g'] for d in pga_data}
+    obs_data_dict = {d['station'].split('.')[1]: d['pga_g'] for d in pga_data}
     sim_data_dict = {d['station']: d['pga_g'] for d in sim_data}
 
     stations_to_compare = sorted(list(obs_data_dict.keys() & sim_data_dict.keys()))
@@ -835,25 +835,27 @@ def compare_results(pga_data, event_id, event_data, output_dir="outdata"):
 
     # Inside compare_results, after Final Summary:
 
-    # 5. Generate Residual Map
-    residual_map_data = []
-    for station, residual in zip(stations_to_compare, residuals):
-        # Find original coordinates from the obs_data_dict
-        original_obs = obs_data_dict[station]
-
-        residual_map_data.append({
-            'latitude': original_obs['latitude'],
-            'longitude': original_obs['longitude'],
-            'pga_g': residual  # Plotting the residual value!
-        })
-
-    if residual_map_data:
-        generate_display_map(
-            pga_data=residual_map_data,
-            event_data=event_data,
-            filename=f"display_residual_map_{event_id}.png",
-            run_dir=run_dir,
-            title="PGA Residuals (log10(Sim) - log10(Obs))"
-        )
+    # # 5. Generate Residual Map
+    # residual_map_data = []
+    # for station, residual in zip(stations_to_compare, residuals):
+    #     # Find original coordinates from the obs_data_dict
+    #     #print(station)
+    #     #print(stations_to_compare)
+    #     original_obs = obs_data_dict[station]
+    #     #print(original_obs)
+    #     residual_map_data.append({
+    #         'latitude': obs_data_dict['latitude'],
+    #         'longitude': obs_data_dict['longitude'],
+    #         'pga_g': residual  # Plotting the residual value!
+    #     })
+    #
+    # if residual_map_data:
+    #     generate_display_map(
+    #         pga_data=residual_map_data,
+    #         event_data=event_data,
+    #         filename=f"display_residual_map_{event_id}.png",
+    #         run_dir=run_dir,
+    #         title="PGA Residuals (log10(Sim) - log10(Obs))"
+    #     )
 
     return True
