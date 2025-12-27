@@ -1,13 +1,16 @@
-# display_monitor_live.py (Updated Imports)
+# display_monitor_live.py (Updated to use new modular structure)
 
 import time
 import datetime
 import os
-from tools import (get_recent_quakes, get_mechanism, generate_bbp_src,
-                   get_nearest_stations, get_waveforms_and_pga,
-                   generate_bbp_stl, generate_bbp_input_text,
-                   run_bbp_simulation, select_1d_velocity_model,
-                   get_simulated_pgas, generate_display_map, compare_results) # <-- ADD compare_results
+
+# Import from new modular structure
+from file_utils import ensure_run_directory
+from event_retrieval import get_recent_quakes, get_mechanism
+from station_operations import get_nearest_stations, get_waveforms_and_pga
+from bbp_generation import generate_bbp_src, generate_bbp_stl, generate_bbp_input_text
+from bbp_execution import run_bbp_simulation
+from visualization import generate_display_map, compare_results
 
 # --- CONFIGURATION ---
 MIN_MAGNITUDE = 3.0
@@ -16,20 +19,14 @@ RADIUS_DEG = SEARCH_RADIUS_KM / 111.0
 CHECK_INTERVAL_SECONDS = 600  # Check every 10 minutes
 
 
-# display_monitor_live.py (Replace the run_live_workflow function)
-
-# display_monitor_live.py (Replace the run_live_workflow function)
-
-# display_monitor_live.py (Replace the run_live_workflow function)
-
 def run_live_workflow(event):
     """
     Executes the Dual-Map Display Pipeline for a single real-time event.
     """
     ev_id = event['id']
 
-    # 🚨 FIX 1: DEFINE run_dir (Needed for file paths and mapping)
-    run_dir = os.path.join("outdata", f"Event_{ev_id}")
+    # Define run directory using utility function
+    run_dir = ensure_run_directory(ev_id)
 
     # 2. Get Stations & Velocity Model
     stations = get_nearest_stations(event, max_radius_deg=RADIUS_DEG)
@@ -38,7 +35,7 @@ def run_live_workflow(event):
     observed_pga_data = get_waveforms_and_pga(event, stations)
 
     if not observed_pga_data:
-        print("❌ No valid observed PGA data could be retrieved. Halting workflow.")
+        print(f"❌ No valid observed PGA data could be retrieved. Halting validation workflow for event {ev_id}.")
         return
 
     # --- Data Validation Filter ---
@@ -55,15 +52,8 @@ def run_live_workflow(event):
         return
     # ------------------------------
 
-    # Generate Map 1: Observed Data
-    # 🚨 FIX 2a: Pass valid_observed_data and the defined run_dir
-    generate_display_map(
-        pga_data=valid_observed_data,
-        event_data=event,
-        filename=f"display_obs_map_pga_{ev_id}.png",
-        run_dir=run_dir,
-        title=f"Observed PGA (RotD50)"
-    )
+    # Note: Observed map will be generated in compare_results() after simulation
+    # to ensure both maps use the same color scale
 
     # 4. Generate Station List File
     stl_file = generate_bbp_stl(event, stations)
