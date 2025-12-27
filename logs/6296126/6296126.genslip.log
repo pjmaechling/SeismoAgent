@@ -1,0 +1,43 @@
+kmodel= 2
+  0:  -121.93884    37.74983 15 17     1.5000     1.7000 0.0 90.0     8.7400
+    0.0000     1.5000     0.7500
+  0:     0.0000     1.5000
+approx. memory= 0.107 MB
+mag= 3.90 median mag= 4.41 nslip= 1 nhypo= 1
+nstk=  15 ndip=  17 dstk=    0.10000000 ddip=    0.10000000
+nstk2= 16 ndip2= 18
+nstk3= 56 ndip3= 56 dstk3=   0.03333334 ddip3=   0.03333334
+js= 0 seed= 12345 ran=   0.000000
+
+     slip_c[0]=   2.880000e+00
+
+
+     orig_avg=   1.000000e+00 orig_sig=   5.630484e+00
+
+slp_avg=   1.27447e+00, normalized to 1
+ratio (negative slip)/(positive slip)= 0.090196
+mom=   8.81047e+21 avgslip= 1 maxslip= 3
+orig_sigma= 5.630484 ... new_sigma= 0.666780
+
+     slip_c[0]=   2.880000e+00
+
+rake: avg=   1.96345e-08 min=  -4.03141e+01 max=   3.14706e+01 sig=   1.50000e+01
+
+     tsfac1_c[0]=   2.880000e+00
+
+tsf1_avg=   1.57475e+00, removed from field
+tsfac1: avg=   0.00000e+00 min=  -2.60410e+00 max=   2.82159e+00 sig=   1.00000e+00
+
+     rtime1_c[0]=   2.880000e+00
+
+rt1_avg=   1.33144e+00, normalized to 1
+ratio (negative rt)/(positive rt)= 0.109804
+rtime1: avg=   1.00000e+00 min=   0.00000e+00 max=   2.71009e+00 sig=   6.67225e-01
+rt_scalefac= 0.924999
+rough: avg=   1.86099e-03 min=  -3.02726e-02 max=   4.18005e-02 sig=   1.46988e-02
+tsf2_avg=   2.93671e-02
+tsfac2: avg=   0.00000e+00 min=  -2.67957e-10 max=   2.90146e-10 sig=   1.00000e-10
+SLIP_AVG= 0.977030
+nstk_fd= 15 ndip_fd= 17
+ixs= 7 iys= 9
+tsmin= -0.06693

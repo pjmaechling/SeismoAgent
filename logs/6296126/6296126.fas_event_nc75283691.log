@@ -1,0 +1,1120 @@
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C045.acc.bbp
+ Writing file 6296126.C045.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C045.acc.bbp.smc8.NS
+
+  Processing file:6296126.C045.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -8.97747952E-07
+ Writing output to file:6296126.C045.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.69689991E-02
+  time_stop_processing_record =    3.45409997E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C045.acc.bbp
+ Writing file 6296126.C045.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C045.acc.bbp.smc8.EW
+
+  Processing file:6296126.C045.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   5.97948656E-07
+ Writing output to file:6296126.C045.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.65619999E-02
+  time_stop_processing_record =    3.42499986E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CSR.acc.bbp
+ Writing file 6296126.CSR.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CSR.acc.bbp.smc8.NS
+
+  Processing file:6296126.CSR.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   2.32196001E-07
+ Writing output to file:6296126.CSR.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.63569991E-02
+  time_stop_processing_record =    3.41859981E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CSR.acc.bbp
+ Writing file 6296126.CSR.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CSR.acc.bbp.smc8.EW
+
+  Processing file:6296126.CSR.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   2.74292518E-07
+ Writing output to file:6296126.CSR.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.63499992E-02
+  time_stop_processing_record =    3.44219990E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C029.acc.bbp
+ Writing file 6296126.C029.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C029.acc.bbp.smc8.NS
+
+  Processing file:6296126.C029.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.73736638E-07
+ Writing output to file:6296126.C029.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.65899992E-02
+  time_stop_processing_record =    3.49129997E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C029.acc.bbp
+ Writing file 6296126.C029.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C029.acc.bbp.smc8.EW
+
+  Processing file:6296126.C029.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   6.91534638E-07
+ Writing output to file:6296126.C029.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.63010005E-02
+  time_stop_processing_record =    3.44789997E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C027.acc.bbp
+ Writing file 6296126.C027.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C027.acc.bbp.smc8.NS
+
+  Processing file:6296126.C027.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -7.05554953E-07
+ Writing output to file:6296126.C027.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.65650006E-02
+  time_stop_processing_record =    3.47810015E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C027.acc.bbp
+ Writing file 6296126.C027.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C027.acc.bbp.smc8.EW
+
+  Processing file:6296126.C027.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   1.19141282E-06
+ Writing output to file:6296126.C027.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.66430008E-02
+  time_stop_processing_record =    3.48469988E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CDOB.acc.bbp
+ Writing file 6296126.CDOB.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CDOB.acc.bbp.smc8.NS
+
+  Processing file:6296126.CDOB.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   2.85584349E-07
+ Writing output to file:6296126.CDOB.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64880008E-02
+  time_stop_processing_record =    3.45660001E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CDOB.acc.bbp
+ Writing file 6296126.CDOB.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CDOB.acc.bbp.smc8.EW
+
+  Processing file:6296126.CDOB.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   5.58243869E-08
+ Writing output to file:6296126.CDOB.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.64689999E-02
+  time_stop_processing_record =    3.46760005E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C062.acc.bbp
+ Writing file 6296126.C062.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C062.acc.bbp.smc8.NS
+
+  Processing file:6296126.C062.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   4.87992686E-08
+ Writing output to file:6296126.C062.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64279994E-02
+  time_stop_processing_record =    3.44250016E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C062.acc.bbp
+ Writing file 6296126.C062.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C062.acc.bbp.smc8.EW
+
+  Processing file:6296126.C062.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   2.57086100E-07
+ Writing output to file:6296126.C062.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.62850004E-02
+  time_stop_processing_record =    3.46399993E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CLCB.acc.bbp
+ Writing file 6296126.CLCB.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CLCB.acc.bbp.smc8.NS
+
+  Processing file:6296126.CLCB.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   1.52006021E-06
+ Writing output to file:6296126.CLCB.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.63000003E-02
+  time_stop_processing_record =    3.44789997E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CLCB.acc.bbp
+ Writing file 6296126.CLCB.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CLCB.acc.bbp.smc8.EW
+
+  Processing file:6296126.CLCB.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -1.93707407E-07
+ Writing output to file:6296126.CLCB.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.62359998E-02
+  time_stop_processing_record =    3.43980007E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CSU.acc.bbp
+ Writing file 6296126.CSU.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CSU.acc.bbp.smc8.NS
+
+  Processing file:6296126.CSU.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -7.54276996E-09
+ Writing output to file:6296126.CSU.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.79229993E-02
+  time_stop_processing_record =    3.71400006E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CSU.acc.bbp
+ Writing file 6296126.CSU.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CSU.acc.bbp.smc8.EW
+
+  Processing file:6296126.CSU.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   7.92447779E-08
+ Writing output to file:6296126.CSU.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.75550003E-02
+  time_stop_processing_record =    3.70469987E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CSU1.acc.bbp
+ Writing file 6296126.CSU1.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CSU1.acc.bbp.smc8.NS
+
+  Processing file:6296126.CSU1.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   1.22706636E-08
+ Writing output to file:6296126.CSU1.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.67599991E-02
+  time_stop_processing_record =    3.49729992E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CSU1.acc.bbp
+ Writing file 6296126.CSU1.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CSU1.acc.bbp.smc8.EW
+
+  Processing file:6296126.CSU1.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   9.22009278E-08
+ Writing output to file:6296126.CSU1.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.78420004E-02
+  time_stop_processing_record =    3.72119993E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C069.acc.bbp
+ Writing file 6296126.C069.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C069.acc.bbp.smc8.NS
+
+  Processing file:6296126.C069.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.73508809E-07
+ Writing output to file:6296126.C069.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.71339996E-02
+  time_stop_processing_record =    3.55710015E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C069.acc.bbp
+ Writing file 6296126.C069.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C069.acc.bbp.smc8.EW
+
+  Processing file:6296126.C069.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -1.74912628E-07
+ Writing output to file:6296126.C069.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.71329994E-02
+  time_stop_processing_record =    3.65820006E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C021.acc.bbp
+ Writing file 6296126.C021.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C021.acc.bbp.smc8.NS
+
+  Processing file:6296126.C021.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   2.56779401E-07
+ Writing output to file:6296126.C021.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64529998E-02
+  time_stop_processing_record =    3.42420004E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C021.acc.bbp
+ Writing file 6296126.C021.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C021.acc.bbp.smc8.EW
+
+  Processing file:6296126.C021.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   3.23807939E-07
+ Writing output to file:6296126.C021.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.67410001E-02
+  time_stop_processing_record =    3.60470004E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CRH.acc.bbp
+ Writing file 6296126.CRH.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CRH.acc.bbp.smc8.NS
+
+  Processing file:6296126.CRH.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.38625381E-07
+ Writing output to file:6296126.CRH.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.62080005E-02
+  time_stop_processing_record =    3.41739990E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CRH.acc.bbp
+ Writing file 6296126.CRH.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CRH.acc.bbp.smc8.EW
+
+  Processing file:6296126.CRH.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -1.04687535E-06
+ Writing output to file:6296126.CRH.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.61899999E-02
+  time_stop_processing_record =    3.39690000E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CBR.acc.bbp
+ Writing file 6296126.CBR.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CBR.acc.bbp.smc8.NS
+
+  Processing file:6296126.CBR.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -2.22139942E-08
+ Writing output to file:6296126.CBR.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.72639992E-02
+  time_stop_processing_record =    3.59629989E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CBR.acc.bbp
+ Writing file 6296126.CBR.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CBR.acc.bbp.smc8.EW
+
+  Processing file:6296126.CBR.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   8.61111715E-08
+ Writing output to file:6296126.CBR.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.68869998E-02
+  time_stop_processing_record =    3.48349996E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CGP1.acc.bbp
+ Writing file 6296126.CGP1.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CGP1.acc.bbp.smc8.NS
+
+  Processing file:6296126.CGP1.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   1.09851818E-07
+ Writing output to file:6296126.CGP1.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.62780005E-02
+  time_stop_processing_record =    3.42589989E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CGP1.acc.bbp
+ Writing file 6296126.CGP1.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CGP1.acc.bbp.smc8.EW
+
+  Processing file:6296126.CGP1.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   2.52294058E-07
+ Writing output to file:6296126.CGP1.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.59460008E-02
+  time_stop_processing_record =    3.38540003E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CGP.acc.bbp
+ Writing file 6296126.CGP.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CGP.acc.bbp.smc8.NS
+
+  Processing file:6296126.CGP.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   1.50252603E-07
+ Writing output to file:6296126.CGP.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64650008E-02
+  time_stop_processing_record =    3.42039987E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CGP.acc.bbp
+ Writing file 6296126.CGP.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CGP.acc.bbp.smc8.EW
+
+  Processing file:6296126.CGP.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   4.92699314E-07
+ Writing output to file:6296126.CGP.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.64020006E-02
+  time_stop_processing_record =    3.45170014E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C003.acc.bbp
+ Writing file 6296126.C003.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C003.acc.bbp.smc8.NS
+
+  Processing file:6296126.C003.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -4.71893429E-07
+ Writing output to file:6296126.C003.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.78880002E-02
+  time_stop_processing_record =    3.71860005E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C003.acc.bbp
+ Writing file 6296126.C003.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C003.acc.bbp.smc8.EW
+
+  Processing file:6296126.C003.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -1.63215802E-07
+ Writing output to file:6296126.C003.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.84799992E-02
+  time_stop_processing_record =    3.80970016E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CMOB.acc.bbp
+ Writing file 6296126.CMOB.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CMOB.acc.bbp.smc8.NS
+
+  Processing file:6296126.CMOB.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -6.64370319E-08
+ Writing output to file:6296126.CMOB.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.63330007E-02
+  time_stop_processing_record =    3.54730003E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CMOB.acc.bbp
+ Writing file 6296126.CMOB.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CMOB.acc.bbp.smc8.EW
+
+  Processing file:6296126.CMOB.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   1.49038641E-07
+ Writing output to file:6296126.CMOB.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.70690008E-02
+  time_stop_processing_record =    3.51409987E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CUSLD.acc.bbp
+ Writing file 6296126.CUSLD.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CUSLD.acc.bbp.smc8.NS
+
+  Processing file:6296126.CUSLD.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -7.90215495E-07
+ Writing output to file:6296126.CUSLD.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.65819991E-02
+  time_stop_processing_record =    3.46559994E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CUSLD.acc.bbp
+ Writing file 6296126.CUSLD.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CUSLD.acc.bbp.smc8.EW
+
+  Processing file:6296126.CUSLD.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -5.75093857E-08
+ Writing output to file:6296126.CUSLD.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.69459991E-02
+  time_stop_processing_record =    3.60059999E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C073.acc.bbp
+ Writing file 6296126.C073.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C073.acc.bbp.smc8.NS
+
+  Processing file:6296126.C073.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.53462139E-07
+ Writing output to file:6296126.C073.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.67050008E-02
+  time_stop_processing_record =    3.44839990E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C073.acc.bbp
+ Writing file 6296126.C073.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C073.acc.bbp.smc8.EW
+
+  Processing file:6296126.C073.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -1.09297140E-07
+ Writing output to file:6296126.C073.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.69549994E-02
+  time_stop_processing_record =    3.48049998E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CNI.acc.bbp
+ Writing file 6296126.CNI.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CNI.acc.bbp.smc8.NS
+
+  Processing file:6296126.CNI.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -7.74385995E-08
+ Writing output to file:6296126.CNI.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64730009E-02
+  time_stop_processing_record =    3.46000008E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CNI.acc.bbp
+ Writing file 6296126.CNI.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CNI.acc.bbp.smc8.EW
+
+  Processing file:6296126.CNI.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -2.77907333E-07
+ Writing output to file:6296126.CNI.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.67459995E-02
+  time_stop_processing_record =    3.51619981E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CSL.acc.bbp
+ Writing file 6296126.CSL.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CSL.acc.bbp.smc8.NS
+
+  Processing file:6296126.CSL.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -5.73999841E-07
+ Writing output to file:6296126.CSL.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.61259994E-02
+  time_stop_processing_record =    3.42199989E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CSL.acc.bbp
+ Writing file 6296126.CSL.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CSL.acc.bbp.smc8.EW
+
+  Processing file:6296126.CSL.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   6.76263170E-08
+ Writing output to file:6296126.CSL.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.59830004E-02
+  time_stop_processing_record =    3.42850015E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C026.acc.bbp
+ Writing file 6296126.C026.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C026.acc.bbp.smc8.NS
+
+  Processing file:6296126.C026.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -9.24761423E-08
+ Writing output to file:6296126.C026.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.62099991E-02
+  time_stop_processing_record =    3.43869999E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C026.acc.bbp
+ Writing file 6296126.C026.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C026.acc.bbp.smc8.EW
+
+  Processing file:6296126.C026.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   2.72822490E-07
+ Writing output to file:6296126.C026.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.78030003E-02
+  time_stop_processing_record =    3.64900008E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CVL.acc.bbp
+ Writing file 6296126.CVL.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CVL.acc.bbp.smc8.NS
+
+  Processing file:6296126.CVL.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.57171783E-07
+ Writing output to file:6296126.CVL.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.65470000E-02
+  time_stop_processing_record =    3.45910005E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CVL.acc.bbp
+ Writing file 6296126.CVL.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CVL.acc.bbp.smc8.EW
+
+  Processing file:6296126.CVL.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -3.30061056E-07
+ Writing output to file:6296126.CVL.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.61440000E-02
+  time_stop_processing_record =    3.40619981E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C068.acc.bbp
+ Writing file 6296126.C068.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C068.acc.bbp.smc8.NS
+
+  Processing file:6296126.C068.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -7.09361601E-08
+ Writing output to file:6296126.C068.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64129995E-02
+  time_stop_processing_record =    3.45080011E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C068.acc.bbp
+ Writing file 6296126.C068.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C068.acc.bbp.smc8.EW
+
+  Processing file:6296126.C068.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   3.93018631E-08
+ Writing output to file:6296126.C068.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.61339995E-02
+  time_stop_processing_record =    3.39960009E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C070.acc.bbp
+ Writing file 6296126.C070.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C070.acc.bbp.smc8.NS
+
+  Processing file:6296126.C070.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.42445927E-07
+ Writing output to file:6296126.C070.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.71799995E-02
+  time_stop_processing_record =    3.53469998E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C070.acc.bbp
+ Writing file 6296126.C070.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C070.acc.bbp.smc8.EW
+
+  Processing file:6296126.C070.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   8.57623590E-08
+ Writing output to file:6296126.C070.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.63279995E-02
+  time_stop_processing_record =    3.45450006E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CRPB.acc.bbp
+ Writing file 6296126.CRPB.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CRPB.acc.bbp.smc8.NS
+
+  Processing file:6296126.CRPB.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   4.47981776E-08
+ Writing output to file:6296126.CRPB.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.72230005E-02
+  time_stop_processing_record =    3.53469998E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CRPB.acc.bbp
+ Writing file 6296126.CRPB.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CRPB.acc.bbp.smc8.EW
+
+  Processing file:6296126.CRPB.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -6.18600371E-09
+ Writing output to file:6296126.CRPB.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.59540009E-02
+  time_stop_processing_record =    3.44819985E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C055.acc.bbp
+ Writing file 6296126.C055.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C055.acc.bbp.smc8.NS
+
+  Processing file:6296126.C055.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.95478345E-09
+ Writing output to file:6296126.C055.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.60830002E-02
+  time_stop_processing_record =    3.43930013E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C055.acc.bbp
+ Writing file 6296126.C055.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C055.acc.bbp.smc8.EW
+
+  Processing file:6296126.C055.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   3.24254614E-08
+ Writing output to file:6296126.C055.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.64110009E-02
+  time_stop_processing_record =    3.48839983E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C042.acc.bbp
+ Writing file 6296126.C042.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C042.acc.bbp.smc8.NS
+
+  Processing file:6296126.C042.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.27579103E-08
+ Writing output to file:6296126.C042.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.61429998E-02
+  time_stop_processing_record =    3.42289992E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C042.acc.bbp
+ Writing file 6296126.C042.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C042.acc.bbp.smc8.EW
+
+  Processing file:6296126.C042.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -1.91934184E-08
+ Writing output to file:6296126.C042.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.60179995E-02
+  time_stop_processing_record =    3.41410004E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C071.acc.bbp
+ Writing file 6296126.C071.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C071.acc.bbp.smc8.NS
+
+  Processing file:6296126.C071.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   1.85178820E-07
+ Writing output to file:6296126.C071.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.69939995E-02
+  time_stop_processing_record =    3.56100015E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C071.acc.bbp
+ Writing file 6296126.C071.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C071.acc.bbp.smc8.EW
+
+  Processing file:6296126.C071.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -8.03473057E-08
+ Writing output to file:6296126.C071.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.68270003E-02
+  time_stop_processing_record =    3.54270004E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C034.acc.bbp
+ Writing file 6296126.C034.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C034.acc.bbp.smc8.NS
+
+  Processing file:6296126.C034.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -6.02648242E-08
+ Writing output to file:6296126.C034.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64330006E-02
+  time_stop_processing_record =    3.47589999E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C034.acc.bbp
+ Writing file 6296126.C034.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C034.acc.bbp.smc8.EW
+
+  Processing file:6296126.C034.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   4.10922780E-08
+ Writing output to file:6296126.C034.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.72489993E-02
+  time_stop_processing_record =    3.54430005E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C060.acc.bbp
+ Writing file 6296126.C060.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C060.acc.bbp.smc8.NS
+
+  Processing file:6296126.C060.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -7.95279220E-08
+ Writing output to file:6296126.C060.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.67720001E-02
+  time_stop_processing_record =    3.50739993E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C060.acc.bbp
+ Writing file 6296126.C060.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C060.acc.bbp.smc8.EW
+
+  Processing file:6296126.C060.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   3.04834948E-08
+ Writing output to file:6296126.C060.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.61540005E-02
+  time_stop_processing_record =    3.48200016E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C048.acc.bbp
+ Writing file 6296126.C048.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C048.acc.bbp.smc8.NS
+
+  Processing file:6296126.C048.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -4.41514381E-08
+ Writing output to file:6296126.C048.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.62659995E-02
+  time_stop_processing_record =    3.44900005E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C048.acc.bbp
+ Writing file 6296126.C048.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C048.acc.bbp.smc8.EW
+
+  Processing file:6296126.C048.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -2.31800907E-08
+ Writing output to file:6296126.C048.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.61639992E-02
+  time_stop_processing_record =    3.42160016E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CBP.acc.bbp
+ Writing file 6296126.CBP.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CBP.acc.bbp.smc8.NS
+
+  Processing file:6296126.CBP.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.26602586E-07
+ Writing output to file:6296126.CBP.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.68939997E-02
+  time_stop_processing_record =    3.54189985E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CBP.acc.bbp
+ Writing file 6296126.CBP.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CBP.acc.bbp.smc8.EW
+
+  Processing file:6296126.CBP.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -8.04946225E-08
+ Writing output to file:6296126.CBP.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.67260002E-02
+  time_stop_processing_record =    3.54110003E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C006.acc.bbp
+ Writing file 6296126.C006.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C006.acc.bbp.smc8.NS
+
+  Processing file:6296126.C006.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   6.40638262E-08
+ Writing output to file:6296126.C006.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64090004E-02
+  time_stop_processing_record =    3.43640000E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C006.acc.bbp
+ Writing file 6296126.C006.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C006.acc.bbp.smc8.EW
+
+  Processing file:6296126.C006.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -4.52120297E-08
+ Writing output to file:6296126.C006.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.59750003E-02
+  time_stop_processing_record =    3.46440002E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CBZ.acc.bbp
+ Writing file 6296126.CBZ.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CBZ.acc.bbp.smc8.NS
+
+  Processing file:6296126.CBZ.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   7.76081066E-08
+ Writing output to file:6296126.CBZ.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.64209995E-02
+  time_stop_processing_record =    3.45419981E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CBZ.acc.bbp
+ Writing file 6296126.CBZ.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CBZ.acc.bbp.smc8.EW
+
+  Processing file:6296126.CBZ.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   1.73764050E-07
+ Writing output to file:6296126.CBZ.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.68570001E-02
+  time_stop_processing_record =    3.51249985E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C056.acc.bbp
+ Writing file 6296126.C056.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C056.acc.bbp.smc8.NS
+
+  Processing file:6296126.C056.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240   1.92492102E-08
+ Writing output to file:6296126.C056.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.68619994E-02
+  time_stop_processing_record =    3.49479988E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C056.acc.bbp
+ Writing file 6296126.C056.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C056.acc.bbp.smc8.EW
+
+  Processing file:6296126.C056.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   4.96761814E-08
+ Writing output to file:6296126.C056.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.63049996E-02
+  time_stop_processing_record =    3.48279998E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.LLNL.acc.bbp
+ Writing file 6296126.LLNL.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.LLNL.acc.bbp.smc8.NS
+
+  Processing file:6296126.LLNL.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.13042269E-07
+ Writing output to file:6296126.LLNL.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.66459996E-02
+  time_stop_processing_record =    3.50349993E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.LLNL.acc.bbp
+ Writing file 6296126.LLNL.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.LLNL.acc.bbp.smc8.EW
+
+  Processing file:6296126.LLNL.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -4.30305533E-08
+ Writing output to file:6296126.LLNL.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.64940003E-02
+  time_stop_processing_record =    3.51900011E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.C038.acc.bbp
+ Writing file 6296126.C038.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.C038.acc.bbp.smc8.NS
+
+  Processing file:6296126.C038.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.62644625E-07
+ Writing output to file:6296126.C038.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.69050004E-02
+  time_stop_processing_record =    3.55530009E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.C038.acc.bbp
+ Writing file 6296126.C038.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.C038.acc.bbp.smc8.EW
+
+  Processing file:6296126.C038.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   1.21650174E-07
+ Writing output to file:6296126.C038.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.67789999E-02
+  time_stop_processing_record =    3.52570005E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.CMC.acc.bbp
+ Writing file 6296126.CMC.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.CMC.acc.bbp.smc8.NS
+
+  Processing file:6296126.CMC.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -1.02296724E-07
+ Writing output to file:6296126.CMC.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.82429999E-02
+  time_stop_processing_record =    3.81130017E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.CMC.acc.bbp
+ Writing file 6296126.CMC.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.CMC.acc.bbp.smc8.EW
+
+  Processing file:6296126.CMC.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240  -2.81973112E-08
+ Writing output to file:6296126.CMC.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.87979992E-02
+  time_stop_processing_record =    3.77589986E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   2
+  
+  Processing file: 6296126.RVRP.acc.bbp
+ Writing file 6296126.RVRP.acc.bbp.smc8.NS
+  nu_out, Output file name =           97 , 6296126.RVRP.acc.bbp.smc8.NS
+
+  Processing file:6296126.RVRP.acc.bbp.smc8.NS
+ indx1, indx2, avy
+           1       10240  -2.17055188E-07
+ Writing output to file:6296126.RVRP.acc.bbp.smc8.NS.no_smooth.fs.col
+  time_start_processing_record =    1.66710000E-02
+  time_stop_processing_record =    3.48460004E-02
+ Enter name of control file (cr = asc2smc.ctl): 
+ sps_in =     0.00
+ ncol2read, icolx, icoly =    3   1   3
+  
+  Processing file: 6296126.RVRP.acc.bbp
+ Writing file 6296126.RVRP.acc.bbp.smc8.EW
+  nu_out, Output file name =           97 , 6296126.RVRP.acc.bbp.smc8.EW
+
+  Processing file:6296126.RVRP.acc.bbp.smc8.EW
+ indx1, indx2, avy
+           1       10240   8.32856131E-08
+ Writing output to file:6296126.RVRP.acc.bbp.smc8.EW.no_smooth.fs.col
+  time_start_processing_record =    1.63380001E-02
+  time_stop_processing_record =    3.45400013E-02

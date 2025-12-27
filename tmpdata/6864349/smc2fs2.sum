@@ -1,0 +1,26 @@
+ Output of program SMC2FS2:
+ Date: 2025/12/27
+ Time: 11:43:39.034
+   Control file = smc2fs2.ctl
+ tskip, tlength_in =
+   0.00000000       2000.00000    
+ dc_remove =  T
+ taper_front, taper_back =
+   0.00000000       0.00000000    
+ signnpw2 =
+   1.00000000    
+ itype, ipow, df_in, smooth_param =
+           0           1   0.00000000      0.200000003    
+ f_intrp_low, f_intrp_high, log_spaced_f, freq_param = 
+   1.000E-02  1.000E+02 F  0.000E+00
+ string4name = .no_smooth.fs.col
+
+ Processing file:6864349.MNHB.acc.bbp.smc8.EW
+   npts =  10240
+   signal_in: dt=0.010000 npts_smc=10240 t_smc=  102.40
+   tlength after smcread =   2000.00
+   signnpw2, nzpad, npw2, t4fft =   1   6144  16384  1.6384E+02
+   Output file = 6864349.MNHB.acc.bbp.smc8.EW.no_smooth.fs.col
+   Elapsed time (sec):   2.081E-02
+
+

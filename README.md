@@ -13,10 +13,11 @@ The goal is to automate the **"validation" loop**: rapidly comparing how well ou
 2. [Architecture](#architecture)
 3. [Prerequisites](#prerequisites)
 4. [Installation](#installation)
-5. [Usage](#usage)
-6. [Workflow Details](#workflow-details)
-7. [Project Structure](#project-structure)
-8. [License](#license)
+5. [Quick Start](#quick-start)
+6. [Usage](#usage)
+7. [Workflow Details](#workflow-details)
+8. [Project Structure](#project-structure)
+9. [License](#license)
 
 ---
 
@@ -38,9 +39,21 @@ The goal is to automate the **"validation" loop**: rapidly comparing how well ou
 
 SeismoAgent acts as a central orchestrator. It runs locally (Python) and interfaces with external Data Centers (Cloud) and a local computational engine (Docker). The architecture is defined by a shared **Tool Library** and three distinct **Execution Agents**. 
 
-### 1. The Core Tool Library (`tools.py`) 🛠️
+### 1. The Core Tool Library (Modular Structure) 🛠️
 
-This file contains all the shared, reusable functions for seismology, processing, and file handling. All agents rely on `tools.py` for execution consistency.
+The codebase has been refactored into a modular structure for better organization and maintainability:
+
+| Module | Purpose | Key Functions |
+| :--- | :--- | :--- |
+| `file_utils.py` | Directory management | `ensure_run_directory` |
+| `event_retrieval.py` | USGS/ComCat data retrieval | `get_recent_quakes`, `get_event_details`, `get_mechanism` |
+| `station_operations.py` | Station finding and waveform processing | `get_nearest_stations`, `get_waveforms_and_pga` |
+| `bbp_generation.py` | BBP file generation | `generate_bbp_src`, `generate_bbp_stl`, `generate_bbp_input_text` |
+| `bbp_execution.py` | BBP simulation execution | `run_bbp_simulation`, `get_simulated_pgas` |
+| `visualization.py` | Map generation and result comparison | `generate_display_map`, `compare_results` |
+| `tools.py` | Backward compatibility layer | Re-exports all functions for existing code |
+
+**Note:** The `tools.py` file maintains backward compatibility by re-exporting all functions, so existing code continues to work without changes. New code should import directly from the specific modules.
 
 ### 2. Execution Agents 🤖
 
@@ -80,12 +93,13 @@ The system operates across three distinct modes, each defined by its own primary
 
 2.  **Set up the Python Environment:**
     ```bash
-# 1. Create and activate
-conda create -n seismo python=3.10
-conda activate seismo
-
-# 2. Install dependencies
-conda install -c conda-forge numpy obspy matplotlib contextily libcomcat docker
+    # 1. Create and activate
+    conda create -n seismo python=3.10
+    conda activate seismo
+    
+    # 2. Install dependencies
+    conda install -c conda-forge numpy obspy matplotlib contextily libcomcat docker
+    ```
 
 3.  **Pull the Simulation Engine:**
     This step downloads the physics codes and velocity models (approx. 24GB).
@@ -95,13 +109,71 @@ conda install -c conda-forge numpy obspy matplotlib contextily libcomcat docker
 
 ---
 
+## Quick Start
+
+### 1. Activate the Conda Environment
+
+This project uses a conda environment called `seismo` which contains all required packages:
+
+```bash
+# Navigate to the project directory
+cd /Users/pjmaechling/PycharmProjects/PythonProject
+
+# Activate the seismo conda environment
+conda activate seismo
+
+# Verify you're using the right Python
+python --version
+# Should show: Python 3.10.15
+
+# Verify packages are available
+python -c "import obspy; print('obspy version:', obspy.__version__)"
+```
+
+### 2. Test the Refactored Code
+
+Run the comprehensive test script to verify all modules work correctly:
+
+```bash
+python test_refactored_code.py
+```
+
+This will verify:
+- ✓ All new modules can be imported
+- ✓ Backward compatibility through tools.py
+- ✓ All functions are callable
+- ✓ Basic functionality works
+
+### 3. Verify You're Using the Updated Code
+
+To confirm you're using the refactored modular structure:
+
+```bash
+python -c "from tools import get_recent_quakes; print('Module:', get_recent_quakes.__module__)"
+```
+
+**Expected output:** `event_retrieval` (not `tools`)
+
+This confirms that `tools.py` is correctly re-exporting from the new modules.
+
+### 4. Run the Application
+
+```bash
+# Run the live monitoring agent
+python display_monitor_live.py
+```
+
+---
+
 ## Usage
 
 **Run the Validation Agent (One-Off Test):**
 
+```bash
 python findPGAs.py
 python night_watch.py
 python display_monitor.py
+```
 
 ## Workflow Details
 
